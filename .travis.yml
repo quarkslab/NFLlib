@@ -1,0 +1,25 @@
+language: cpp
+sudo: false
+
+
+addons:
+    apt:
+        sources:
+            - llvm-toolchain-precise-3.5
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-5
+            - clang-3.5
+            - libgmp-dev
+            - libmpfr-dev
+
+env:
+    - NFL_CXX=g++-5 NFL_OPTIMIZED=ON
+    - NFL_CXX=g++-5 NFL_OPTIMIZED=OFF
+    - NFL_CXX=clang++-3.5 NFL_OPTIMIZED=ON
+    - NFL_CXX=clang++-3.5 NFL_OPTIMIZED=OFF
+
+script:
+    - cmake . -DNFL_OPTIMIZED=$NFL_OPTIMIZED -DCMAKE_CXX_COMPILER=$NFL_CXX -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/install
+    - make && make test ARGS="-VV" && make install
+
