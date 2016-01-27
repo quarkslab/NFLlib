@@ -41,13 +41,13 @@ Polynomials are the core of NFLlib. In NFLlib, a polynomial is described as a tr
 
     The degree of the polynomial. Must be a power of two.
 
-:modulus:
+:modulus_bitsize:
 
-    The number of bits of its coefficients. Must be equal to the bit size of the type used to store the polynomial cminus two, times an integer (e.g. if type is uint32_t, the modulus can be 30, 60, 90, etc.)
+    The number of bits of its coefficients. Must be equal to the bit size of the type used to store the polynomial minus two, times an integer (e.g. if type is uint32_t, modulus_bitsize can be 30, 60, 90, etc.)   
 
-Programatically, you can retreive a given polynomial type using the type generator ``nfl::poly_from_modulus<type, degree, modulus>``, for instance using a type alias::
+Programatically, you can retreive a given polynomial type using the type generator ``nfl::poly_from_modulus<type, degree, modulus_bitsize>``, for instance using a type alias:
 
-.. code:: c++
+.. code-block:: c++
 
     #include "nfl.hpp"
     using poly_type = nfl::poly_from_modulus<uint32_t, 512, 30>
@@ -59,11 +59,13 @@ are invalid, in that case you should receive a compile-time error!
 Initialization
 ==============
 
+.. highlight:: c++
+
 Polynomials can be initialized in multiple ways:
 
 :null polynomial:
 
-    The default constructor builds a polynomial with all coefficients set to zero::
+    The default constructor builds a polynomial with all coefficients set to zero:: 
 
         poly_type P; // the null polynomial P(X) = 0
 
@@ -83,14 +85,14 @@ Polynomials can be initialized in multiple ways:
 
     A polynomial initialized with an uniform distribution::
 
-        poly_type P(nfl::uniform())
+        poly_type P(nfl::uniform());
 
 :non-uniform polynomial:
 
     A polynomial initialized with a bounded uniform distribution::
 
         uint32_t constexpr bound = 8;
-        poly_type P(nfl::non_uniform(8))
+        poly_type P(nfl::non_uniform(8));
 
 :gaussian polynomial:
 
@@ -100,10 +102,9 @@ Polynomials can be initialized in multiple ways:
         nfl::FastGaussianNoise<uint8_t, typename poly_type::value_type, 2> g_prng(8, 128, 1<<15);
         // Define a struct to access the generator via a constructor (parameters are explained below)
         nfl::gaussian<typename poly_type::value_type> gaussian_struct(&g_prng, 2);
-        // This initializes P as a polynomial with coefficients following closely a discrete gaussian in
-        // the sense of [1] with standard deviation of 8. The output distribution is within a statistical
+        // This initializes P as a polynomial with coefficients following closely a discrete gaussian in 
+        // the sense of [1] with standard deviation of 8. The output distribution is within a statistical 
         // distance of the target distribution of 2^{-128} as long as the polynomial degree is below 2^{15}.
-
         // As usual in cryptography, the coefficients of this noise polynomial have been multiplied by 2 as
         // requested by the second parameter of the struct constructor.
         // [1]: Sampling from discrete Gaussians for lattice-based cryptography on a constrained device
@@ -114,23 +115,43 @@ Polynomials can be initialized in multiple ways:
 Gaussian generators
 ===================
 
-Polynomials with coefficients following a discrete gaussian are needed in most cryptographic applications. These are obtained using a gaussian generator which is defined by two triplets.
+Polynomials with coefficients following a discrete gaussian are needed in most cryptographic applications. These are obtained using a gaussian generator which is defined by two triplets::
+        
+        nfl::FastGaussianNoise<internal_array_index_type,  output_type, recursion_level> gaussian_prng_instance(sigma, security, max_degree);
 
-The first triplet defines the type and exists only to improve performance using some parameters at compilation time:
+
+The first triplet ``<internal_array_type, output_type, recursion_level>`` defines the type through a template and exists only to improve performance using some parameters at compilation time. The second triplet ``(sigma, security, max_degree)`` is used by the constructor to define the generator. 
+
+ 
+
+The different parameters are used as follows:
 
 :internal_array_index_type:
 
-    May be uint8_t or uint16_t, the latter type increases memory usage by a factor 255 but can lower the computational cost of the noise generation.
+    May be uint8_t or uint16_t, the latter type can improve computational performance but increases memory usage as the internal lookup tables used are larger.
 
 :output_type:
 
-    The type used to store the output noise. May be a signed (positive or negative outputs) or unsigned (TODO FINISH the modulus is added to negative outputs) type.
+    The type used to store the output noise. Note that if the noise generated is signed and if the output type is unsigned the sign is just removed. If the application context requires working modulo a number it is thus best to retrieve a signed result and add the modulus when needed to get a positive result.
 
-:internal_array_index_type:
+:recursion_level:
 
-    May be uint8_t or uint16_t
+    May be 1 or 2. Recursion level 2 may improve computational performance but increases memory usage. 
 
-The library optimize these operations to avoid creation of temporaries polynomials and vectorize the operations.
+:sigma:
+
+    Standard deviation (in the sense of [1]) of the discrete gaussian from which are sampled the polynomial coefficients.
+
+    [1]: Sampling from discrete Gaussians for lattice-based cryptography on a constrained device Nagarjun C. Dwarakanath, Steven Galbraith, AAECC 2014 (25)
+ 
+:security:
+
+    The statistical distance between the output distribution and the target distribution is below 2^{-security}  as long as the degree of the polynomial is not to large.
+
+:degree:
+  
+    Maximum degree for a polynomial to respect the statistical distance requested by the parameter ``security``.
+
 
 Operations on Polynomials
 =========================
@@ -139,8 +160,7 @@ Once a polynomial is created, you can do basic arithmetic on them, as in::
 
     poly_type P = P0 + P1 * P2;
 
-The library optimize these operations to avoid creation of temporaries polynomials and vectorize the operations.
-
+The library optimizes these operations to avoid the creation of temporary polynomials and vectorizes the operations.
 
 .. Concepts
 .. --------
