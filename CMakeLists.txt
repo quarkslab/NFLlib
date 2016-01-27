@@ -38,7 +38,7 @@ include_directories(include include/nfl include/nfl/arch include/nfl/prng)
 
 
 file(GLOB NFLLIB_ASMS lib/prng/*.s)
-file(GLOB NFLLIB_SRCS lib/prng/*.cpp lib/src/*.cpp)
+file(GLOB NFLLIB_SRCS lib/prng/*.cpp lib/params/*.cpp)
 file(GLOB NFLLIB_HDRS_0 include/nfl.hpp)
 file(GLOB NFLLIB_HDRS_1 include/nfl/*.hpp)
 file(GLOB NFLLIB_HDRS_2 include/nfl/arch/*.hpp)
