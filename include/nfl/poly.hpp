@@ -46,12 +46,12 @@ struct non_uniform {
   non_uniform(uint64_t ub, uint64_t amp) : upper_bound{ub}, amplifier{amp} {}
 };
 
-template<class T>
+template<class in_class, class out_class, unsigned _lu_depth>
 struct gaussian {
-  FastGaussianNoise<uint8_t, T, 2> *fg_prng;
+  FastGaussianNoise<in_class, out_class, _lu_depth> *fg_prng;
   uint64_t amplifier;
-  gaussian(FastGaussianNoise<uint8_t, T, 2> *prng) : fg_prng{prng}, amplifier{1} {}
-  gaussian(FastGaussianNoise<uint8_t, T, 2> *prng, uint64_t amp) : fg_prng{prng}, amplifier{amp} {}
+  gaussian(FastGaussianNoise<in_class, out_class, _lu_depth> *prng) : fg_prng{prng}, amplifier{1} {}
+  gaussian(FastGaussianNoise<in_class, out_class, _lu_depth> *prng, uint64_t amp) : fg_prng{prng}, amplifier{amp} {}
 };
 
 // Forward declaration for proxy class used in tests to access poly
@@ -98,14 +98,15 @@ public:
   poly(value_type v);
   poly(uniform const& mode);
   poly(non_uniform const& mode);
-  poly(gaussian<T> const& mode);
+  template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
   poly(std::initializer_list<value_type> values);
   template<class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
 
   void set(value_type v);
   void set(uniform const& mode);
   void set(non_uniform const& mode);
-  void set(gaussian<T> const& mode);
+  template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode);
+  void set(void* mode);
   void set(std::initializer_list<value_type> values);
 
   /* assignment
@@ -113,7 +114,7 @@ public:
   poly& operator=(value_type v) { set(v); return *this; }
   poly& operator=(uniform const& mode) { set(mode); return *this; }
   poly& operator=(non_uniform const& mode) { set(mode); return *this; }
-  poly& operator=(gaussian<T> const& mode) { set(mode); return *this; }
+  template <class in_class, unsigned _lu_depth> poly& operator=(gaussian<in_class, T, _lu_depth> const& mode) { set(mode); return *this; }
   poly& operator=(std::initializer_list<value_type> values) { set(values); return *this; }
   template<class Op, class... Args> poly& operator=(ops::expr<Op, Args...> const& expr);
 

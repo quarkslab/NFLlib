@@ -251,12 +251,14 @@ void poly<T, Degree, NbModuli>::set(non_uniform const& mode) {
 }
 
 template<class T, size_t Degree, size_t NbModuli>
-poly<T, Degree, NbModuli>::poly(gaussian<T> const& mode) {
+template<class in_class, unsigned _lu_depth>
+poly<T, Degree, NbModuli>::poly(gaussian<in_class, T, _lu_depth> const& mode) {
   set(mode);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(gaussian<T> const& mode) {
+template<class in_class, unsigned _lu_depth>
+void poly<T, Degree, NbModuli>::set(gaussian<in_class, T, _lu_depth> const& mode) {
   uint64_t const amplifier = mode.amplifier;
 
   // We play with the rnd pointer (in the uniform case), and thus
@@ -288,6 +290,7 @@ void poly<T, Degree, NbModuli>::set(gaussian<T> const& mode) {
   }
 #endif
 }
+
 
 // *********************************************************
 // Helper functions

@@ -26,15 +26,15 @@ template <class P>
 __attribute__((noinline)) static void encrypt(P& resa, P& resb, P const & pka, P const & pkb, P const & pkaprime, P const & pkbprime, FastGaussianNoise<uint8_t, typename P::value_type, 2> *g_prng)
 {
   // u
-  P tmpu = nfl::gaussian<typename P::value_type>(g_prng);
+  P tmpu = nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng);
   tmpu.ntt_pow_phi();
   
   // 2*e_1
-  P tmpe1 = nfl::gaussian<typename P::value_type>(g_prng, 2);
+  P tmpe1 = nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng, 2);
   tmpe1.ntt_pow_phi();
 
   // 2*e_2
-  P tmpe2 = nfl::gaussian<typename P::value_type>(g_prng, 2);
+  P tmpe2 = nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng, 2);
   tmpe2.ntt_pow_phi();
 
   // resa = pka * u + 2*e_2
@@ -165,8 +165,8 @@ int run()
 #ifdef TEST_GAUSSIAN_GENERATION
   FastGaussianNoise<uint8_t, T, 2> fg_prng(20, 128, 1<<14);
   start = std::chrono::steady_clock::now();
-  std::fill(resa, resa + REPETITIONS, nfl::gaussian<T>(&fg_prng));
-  std::fill(resb, resb + REPETITIONS, nfl::gaussian<T>(&fg_prng));
+  std::fill(resa, resa + REPETITIONS, nfl::gaussian<uint8_t, T, 2>(&fg_prng));
+  std::fill(resb, resb + REPETITIONS, nfl::gaussian<uint8_t, T, 2>(&fg_prng));
   end = std::chrono::steady_clock::now();
   std::cout << "Time per polynomial generation (gaussian sigma=20 k=128): " << get_time_us(start, end, 2*REPETITIONS) << " us" << std::endl;
 #endif
@@ -298,7 +298,7 @@ int run()
   FastGaussianNoise<uint8_t, T, 2> g_prng(SIGMA, 128, 1<<10);
   // BUG CRASHES
   //FastGaussianNoise<uint8_t, T, 2> g_prng(SIGMA, 80, 1<<8);
-  poly_t &s = *alloc_aligned<poly_t, 32>(1, nfl::gaussian<T>(&g_prng));
+  poly_t &s = *alloc_aligned<poly_t, 32>(1, nfl::gaussian<uint8_t, T, 2>(&g_prng));
   poly_t &sprime = *alloc_aligned<poly_t, 32>(1);
   //for(auto & v : s)
   //{
@@ -310,7 +310,7 @@ int run()
 
   // This step generates a public key
   pka = nfl::uniform();
-  pkb = nfl::gaussian<T>(&g_prng, 2);
+  pkb = nfl::gaussian<uint8_t, T, 2>(&g_prng, 2);
   pkb.ntt_pow_phi();
 
   // pkb = pkb + pka * s;
