@@ -78,6 +78,9 @@ void poly<T, Degree, NbModuli>::set(value_type v) {
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values) {
+  // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
+  assert((unsigned long)(this->_data) % 32 == 0);
+
   auto* iter = begin();
   auto viter = values.begin();
 
@@ -124,6 +127,9 @@ poly<T, Degree, NbModuli>::poly(uniform const& u) {
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(uniform const &) {
+  // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
+  assert((unsigned long)(this->_data) % 32 == 0);
+
   // In uniform mode we need randomness for all the polynomials in the CRT
   fastrandombytes((unsigned char *)data(), sizeof(poly));
 
@@ -164,6 +170,9 @@ poly<T, Degree, NbModuli>::poly(non_uniform const& mode) {
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(non_uniform const& mode) {
+  // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
+  assert((unsigned long)(this->_data) % 32 == 0);
+
   uint64_t const upper_bound = mode.upper_bound;
   uint64_t const amplifier = mode.amplifier;
   // In bounded mode upper_bound must be below the smaller of the moduli
@@ -259,6 +268,9 @@ poly<T, Degree, NbModuli>::poly(gaussian<in_class, T, _lu_depth> const& mode) {
 template<class T, size_t Degree, size_t NbModuli>
 template<class in_class, unsigned _lu_depth>
 void poly<T, Degree, NbModuli>::set(gaussian<in_class, T, _lu_depth> const& mode) {
+  // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
+  assert((unsigned long)(this->_data) % 32 == 0);
+
   uint64_t const amplifier = mode.amplifier;
 
   // We play with the rnd pointer (in the uniform case), and thus
