@@ -14,6 +14,8 @@
 #ifndef NFL_POLY_HPP
 #define NFL_POLY_HPP
 
+#include <gmpxx.h>
+
 /***
  * Polynomial class for NFL
  *
@@ -204,6 +206,49 @@ public:
 
   static core base;
 
+  protected:
+  // NTT-based Fast Lattice library GMP class
+  class GMP {
+
+  public:
+
+    mpz_t   moduli_product;
+    mpz_t   modulus_shoup;
+    unsigned bits_in_moduli_product;
+    mpz_t*  lifting_integers;
+
+    /* Constructor & Destructor
+     */
+    GMP();
+    ~GMP();
+
+    /* GMP Functions
+     */
+
+    mpz_t*  poly2mpz(const poly&);
+    void    poly2mpz(mpz_t*, const poly&);
+    poly    mpz2poly(const mpz_t *);
+    void    mpz2poly(poly&, const mpz_t *);
+  };
+
+public:
+  poly(mpz_t v);
+  poly(mpz_t* values);
+  poly(mpz_class v);
+  poly(mpz_class* values);
+  
+  void set(mpz_t v);
+  void set(mpz_t* values);
+  void set(mpz_class v);
+  void set(mpz_class* values);
+  
+  poly& operator=(mpz_t v) { set(v); return *this; }
+  poly& operator=(mpz_t* values) { set(values); return *this; }
+  poly& operator=(mpz_class v) { set(v); return *this; }
+  poly& operator=(mpz_class* values) { set(values); return *this; }
+  
+  static GMP gmp;
+
 }  __attribute__((aligned(32)));
 
 
@@ -252,5 +297,6 @@ DECLARE_UNARY_OPERATOR(compute_shoup, compute_shoup)
 }
 
 #include "nfl/core.hpp"
+#include "nfl/gmp.hpp"
 
 #endif
