@@ -1,7 +1,5 @@
 # NFLlib
-NTT-based Fast Lattice library
-
-Work in Progress ... the library should be available in a few weeks.
+An NTT-based Fast Lattice library
 
 ## Goal
 
@@ -9,7 +7,7 @@ NFLlib is an efficient and open-source C++ library dedicated to ideal lattice cr
 
 ## License
 
-When published here the library will be available under an open source license.
+GPLv3
 
 # Install Steps
 
@@ -32,12 +30,24 @@ Option                             | Description
 -----------------------------------|---------------------------------
 `-DCMAKE_INSTALL_PREFIX=<value>`   | Where the library is installed
 `-DCMAKE_BUILD_TYPE=Release|Debug` | The basic compiler configuration
-`-DNFL_OPTIMIZED=ON`               | Enable SSE|AVX-based optimization
-
-# Contributors 
-
-This library is an extension/evolution of the NTTTools module from [XPIR](https://github.com/XPIR-team/XPIR) done by members of [Cryptoexperts](https://www.cryptoexperts.com), [INP ENSEEIHT](http://www.enseeiht.com), [Quarkslab](http://www.quarkslab.com) (in alphabetical order).
+`-DNFL_OPTIMIZED=ON`               | Enable SSE/AVX-based optimization
 
 # Getting started
 
-Read The Docs!
+In order to get the documentation you need Sphinx and the Alabaster theme. Installation procedures are described at (we recommend using pip for both installations) :
+
+  * http://www.sphinx-doc.org/en/stable/install.html
+  * https://anaconda.org/pypi/alabaster
+
+After getting both Sphinx and the Alabaster theme build the documentation and show it with:
+
+```
+$> sphinx-build . build
+$> your_favorite_browser build/nfl.html
+```
+
+If you have issues building the documentation please contact the developper team.
+
+# Contributors
+
+This library is an extension/evolution of the NTTTools module from [XPIR](https://github.com/XPIR-team/XPIR) done by members of [Cryptoexperts](https://www.cryptoexperts.com), [INP ENSEEIHT](http://www.enseeiht.com), [Quarkslab](http://www.quarkslab.com) (in alphabetical order).
