@@ -96,7 +96,7 @@ void poly<T, Degree, NbModuli>::set(It first, It last) {
   auto* iter = begin();
   auto viter = first;
 
-  auto size = std::distance(first, last);
+  size_t size = std::distance(first, last);
   // If the initializer has no more values than the polynomial degree use them 
   // to initialize the associated coefficients for each sub-modulus
   if (size <= degree)
