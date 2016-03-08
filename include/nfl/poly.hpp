@@ -102,6 +102,7 @@ public:
   poly(non_uniform const& mode);
   template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
   poly(std::initializer_list<value_type> values);
+  template <class It> poly(It first, It last);
   template<class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
 
   void set(value_type v);
@@ -110,7 +111,8 @@ public:
   template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode);
   void set(void* mode);
   void set(std::initializer_list<value_type> values);
-
+  template <class It> void set(It first, It last);
+  
   /* assignment
    */
   poly& operator=(value_type v) { set(v); return *this; }
