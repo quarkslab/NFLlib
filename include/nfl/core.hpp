@@ -72,28 +72,41 @@ poly<T, Degree, NbModuli>::poly(std::initializer_list<value_type> values) {
 }
 
 template<class T, size_t Degree, size_t NbModuli>
+template<class It>
+poly<T, Degree, NbModuli>::poly(It first, It last) {
+  set(first, last);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(value_type v) {
   set({v});
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values) {
+  set(values.begin(), values.end());
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+template<class It>
+void poly<T, Degree, NbModuli>::set(It first, It last) {
   // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
   assert((unsigned long)(this->_data) % 32 == 0);
 
   auto* iter = begin();
-  auto viter = values.begin();
+  auto viter = first;
 
+  auto size = std::distance(first, last);
   // If the initializer has no more values than the polynomial degree use them 
   // to initialize the associated coefficients for each sub-modulus
-  if (values.size() <= degree)
+  if (size <= degree)
   {
     for(size_t cm = 0; cm < nmoduli; ++cm) 
     {
-      viter = values.begin();
+      viter = first;
       for(size_t i = 0; i < degree; i++)
       {  
-        if (viter < values.end()) *iter++ = *viter++;
+        if (viter < last) *iter++ = *viter++;
         else *iter++ = 0;
       }
     }
@@ -101,7 +114,7 @@ void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values) {
   else 
   {
     // Else we want to fully define the polynomial
-    if (values.size() != nmoduli*degree)
+    if (size != nmoduli*degree)
     {
       std::cerr << "core.hpp: CRITICAL, initializer of size above degree but not equal to nmoduli*degree" << std::endl;
       exit(1);
