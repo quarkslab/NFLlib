@@ -101,13 +101,16 @@ void poly<T, Degree, NbModuli>::set(It first, It last) {
   // to initialize the associated coefficients for each sub-modulus
   if (size <= degree)
   {
-    for(size_t cm = 0; cm < nmoduli; ++cm) 
+    for(size_t cm = 0; cm < nmoduli; cm++) 
     {
       viter = first;
       for(size_t i = 0; i < degree; i++)
-      {  
-        if (viter < last) *iter++ = *viter++;
-        else *iter++ = 0;
+      {
+        if (viter < last) {
+          *iter++ = (*viter++) % get_modulus(cm);
+        } else {
+          *iter++ = 0;
+        }
       }
     }
   }
