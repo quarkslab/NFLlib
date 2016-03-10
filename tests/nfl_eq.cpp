@@ -11,11 +11,7 @@ bool run()
   poly_t* resa = alloc_aligned<poly_t, 32>(ITERATIONS, nfl::uniform());
   
   bool ret_value = true;
-  // Simple unitary test
-  // AG: commented because it uses stack variables!
-  //ret_value &= (poly_t{{1,2,3,4}} == poly_t{{1,2,3,4}}); 
-  //ret_value &= (poly_t{{1,2,3,4}} == poly_t{{2,12,34,56}}); 
-  // Some more randomized tests
+  // Randomized tests
   for (size_t i = 0 ; i < ITERATIONS; i++)
     ret_value &= (resa[i] == resa[i]);
 
@@ -24,6 +20,26 @@ bool run()
   return ret_value;
 }
 
+template<size_t degree, size_t modulus, class T>
+bool run_p()
+{
+  using poly_p = nfl::poly_p<T, degree, modulus>;
+
+  poly_p* resa = new poly_p[ITERATIONS];
+  for (size_t i = 0 ; i < ITERATIONS; i++) {
+    resa[i] = poly_p{nfl::uniform()};
+  }
+  
+  bool ret_value = true;
+  // Randomized tests
+  for (size_t i = 0 ; i < ITERATIONS; i++)
+    ret_value &= (resa[i] == resa[i]);
+
+  delete[] resa;
+
+  return ret_value;
+}
+
 int main(int argc, char const* argv[]) {
-  return not run<CONFIG>() ;
+  return not (run<CONFIG>() and run_p<CONFIG>()) ;
 }

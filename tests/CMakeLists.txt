@@ -10,6 +10,7 @@ set(CONFIGS
     "512, 30, uint32_t"
 	#"512, 14, uint16_t"
 	#"256, 14, uint16_t"
+    "8, 60, uint32_t"
 )
 
 #always double check during tests
@@ -28,7 +29,7 @@ foreach(CONFIG ${CONFIGS})
 
     endforeach()
 
-    foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p)
+    foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p poly_set)
         file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp"
             "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/${OP}.cpp\"\n")
         add_executable(${OP}${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp)
