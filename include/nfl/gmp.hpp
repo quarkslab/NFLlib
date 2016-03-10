@@ -11,62 +11,98 @@ typename poly<T, Degree, NbModuli>::GMP poly<T, Degree, NbModuli>::gmp;
 
 template<class T, size_t Degree, size_t NbModuli>
 poly<T, Degree, NbModuli>::poly(mpz_t v) {
-  set(v);
+  set_mpz(v);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 poly<T, Degree, NbModuli>::poly(mpz_class v) {
-  set(v);
+  set_mpz({v});
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+poly<T, Degree, NbModuli>::poly(std::initializer_list<mpz_class> values) {
+  set_mpz(values);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 poly<T, Degree, NbModuli>::poly(mpz_t* values) {
-  set(values);
+  set_mpz(values);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 poly<T, Degree, NbModuli>::poly(mpz_class* values) {
-  set(values);
+  set_mpz(values);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(mpz_t v)
+void poly<T, Degree, NbModuli>::set_mpz(mpz_t v)
 {
+  set_mpz({mpz_class(v)});
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set_mpz(mpz_class v)
+{
+  set_mpz({v});
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set_mpz(mpz_t* values)
+{
+	std::vector<mpz_class> v;
+	for (size_t i=0; i<degree; i++) {
+		v.push_back(mpz_class(values[i]));
+	}
+	set_mpz(v.begin(), v.end());
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set_mpz(mpz_class* values)
+{
+	std::vector<mpz_class> v;
+	for (size_t i=0; i<degree; i++) {
+		v.push_back(values[i]);
+	}
+	set_mpz(v.begin(), v.end());
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set_mpz(std::initializer_list<mpz_class> values)
+{
+	set_mpz(values.begin(), values.end());
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+template<class It>
+void poly<T, Degree, NbModuli>::set_mpz(It first, It last) {
+  // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
+  assert((unsigned long)(this->_data) % 32 == 0);
+
   auto* iter = begin();
-  
-  for(size_t cm = 0; cm < nmoduli; ++cm) 
+  auto viter = first;
+
+  size_t size = std::distance(first, last);
+  // If the initializer has no more values than the polynomial degree use them 
+  // to initialize the associated coefficients for each sub-modulus
+  if (size <= degree)
   {
-    *iter++ = mpz_fdiv_ui(v, params<T>::P[cm]);
-    for(size_t i = 1; i < degree; i++)
-    {  
-      *iter++ = 0;
+    for(size_t cm = 0; cm < nmoduli; ++cm) 
+    {
+      viter = first;
+      for(size_t i = 0; i < degree; i++)
+      {  
+        if (viter < last) {
+        	*iter++ = mpz_fdiv_ui((*viter).get_mpz_t(), params<T>::P[cm]);
+        	viter++;
+        }
+        else *iter++ = 0;
+      }
     }
   }
-}
-
-template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(mpz_class v)
-{
-  set(v.get_mpz_t());
-}
-
-template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(mpz_t* values)
-{
-	*this = gmp.mpz2poly(values);
-}
-
-template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(mpz_class* values)
-{
-	mpz_t* values_mpz_t = new mpz_t[nmoduli*degree];
-	for (size_t i=0; i<nmoduli*degree; i++) {
-		mpz_init_set(values_mpz_t[i], values[i].get_mpz_t());
-	}
-	*this = gmp.mpz2poly(values_mpz_t);
-	for (size_t i=0; i<nmoduli*degree; i++) {
-		mpz_clear(values_mpz_t[i]);
-	}
+  else 
+  {
+  	std::cerr << "gmp.hpp: CRITICAL, initializer of size above degree" << std::endl;
+  }
 }
 
 template<class T, size_t Degree, size_t NbModuli>

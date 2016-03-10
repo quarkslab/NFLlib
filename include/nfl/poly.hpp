@@ -238,16 +238,20 @@ public:
   poly(mpz_t* values);
   poly(mpz_class v);
   poly(mpz_class* values);
+  poly(std::initializer_list<mpz_class> values);
   
-  void set(mpz_t v);
-  void set(mpz_t* values);
-  void set(mpz_class v);
-  void set(mpz_class* values);
+  void set_mpz(mpz_t v);
+  void set_mpz(mpz_t* values);
+  void set_mpz(mpz_class v);
+  void set_mpz(mpz_class* values);
+  void set_mpz(std::initializer_list<mpz_class> values);
+  template<class It> void set_mpz(It first, It last);
   
-  poly& operator=(mpz_t v) { set(v); return *this; }
-  poly& operator=(mpz_t* values) { set(values); return *this; }
-  poly& operator=(mpz_class v) { set(v); return *this; }
-  poly& operator=(mpz_class* values) { set(values); return *this; }
+  poly& operator=(mpz_t v) { set_mpz(v); return *this; }
+  poly& operator=(mpz_t* values) { set_mpz(values); return *this; }
+  poly& operator=(mpz_class v) { set_mpz(v); return *this; }
+  poly& operator=(mpz_class* values) { set_mpz(values); return *this; }
+  poly& operator=(std::initializer_list<mpz_class> values) { set_mpz(values); return *this; }
   
   static GMP gmp;
 
