@@ -87,6 +87,7 @@ bool run() {
   }
 
   // Cleaning
+  free_aligned(1, &p0);
   free_aligned(1, &p1);
   free_aligned(1, &p2);
   free_aligned(1, &p3);
