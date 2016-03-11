@@ -50,12 +50,16 @@ public:
   poly_type const& poly_obj() const { return *_p; }
 
 public:
-  template <class O>
-  poly_p& operator=(O&& o)
-  {
-    poly_obj() = std::forward<T>(o);
-    return *this;
-  }
+ template <class O>
+ poly_p& operator=(O&& o) {
+   poly_obj() = std::forward<O>(o);
+   return *this;
+ }
+
+ poly_p& operator=(std::initializer_list<T> values) {
+   poly_obj() = std::forward<std::initializer_list<T>>(values);
+   return *this;
+ }
 
   poly_p& operator=(poly_p const& o) 
   {
@@ -125,8 +129,14 @@ public:
 
   value_type& operator()(size_t cm, size_t i) { return poly_obj()(cm, i); }
   value_type const& operator()(size_t cm, size_t i) const { return poly_obj()(cm, i); }
+  template<class M> auto load(size_t cm, size_t i) const -> decltype(M::load(&(this->operator()(cm, i)))) { return M::load(&(*this)(cm, i)); }
 
   static constexpr value_type get_modulus(size_t n) { return poly_type::get_modulus(n); }
+
+  /* ntt stuff - public API
+   */
+  void ntt_pow_phi() { poly_obj().ntt_pow_phi();}
+  void invntt_pow_invphi() { poly_obj().invntt_pow_invphi(); }
 
 private:
   template <class... Args>
@@ -161,6 +171,8 @@ std::ostream& operator<<(std::ostream& os, nfl::poly_p<T, Degree, NbModuli> cons
   return os << p.poly_obj();
 }
 
+/* unary operators
+*/
 template<class E, class T, size_t Degree, size_t NbModuli>
 auto shoup(E const& e, poly_p<T, Degree, NbModuli> const& m) -> decltype(shoup(e, m.poly_obj()))
 {
@@ -172,6 +184,26 @@ auto compute_shoup(poly_p<T, Degree, NbModuli> const& p) -> decltype(compute_sho
 {
   return compute_shoup(p.poly_obj());
 }
+
+/* operator overloads - includes expression templates
+ */
+#define DECLARE_BINARY_OPERATOR_P(SYM, NAME)\
+template<class T, size_t Degree, size_t NbModuli>\
+auto SYM(nfl::poly_p<T, Degree, NbModuli> const& op0, nfl::poly_p<T, Degree, NbModuli> const& op1) -> decltype(ops::make_op<ops::NAME<T, CC_SIMD>>(op0, op1)) {\
+  return ops::make_op<ops::NAME<T, CC_SIMD>>(op0, op1);\
+}\
+template<class T, size_t Degree, size_t NbModuli, class Op, class...Args>\
+auto SYM(nfl::poly_p<T, Degree, NbModuli> const& op0, nfl::ops::expr<Op, Args...> const& op1) -> decltype(ops::make_op<ops::NAME<typename nfl::ops::expr<Op, Args...>::value_type, typename nfl::ops::expr<Op, Args...>::simd_mode>>(op0, op1)) {\
+  return ops::make_op<ops::NAME<typename nfl::ops::expr<Op, Args...>::value_type, typename nfl::ops::expr<Op, Args...>::simd_mode>>(op0, op1);\
+}\
+template<class T, size_t Degree, size_t NbModuli, class Op, class...Args>\
+auto SYM(nfl::ops::expr<Op, Args...> const& op0, nfl::poly_p<T, Degree, NbModuli> const& op1) -> decltype(ops::make_op<ops::NAME<typename nfl::ops::expr<Op, Args...>::value_type, typename nfl::ops::expr<Op, Args...>::simd_mode>>(op0, op1)){\
+  return ops::make_op<ops::NAME<typename nfl::ops::expr<Op, Args...>::value_type, typename nfl::ops::expr<Op, Args...>::simd_mode>>(op0, op1);\
+}
+
+DECLARE_BINARY_OPERATOR_P(operator-, submod)
+DECLARE_BINARY_OPERATOR_P(operator+, addmod)
+DECLARE_BINARY_OPERATOR_P(operator*, mulmod)
 
 } // nfl
 
