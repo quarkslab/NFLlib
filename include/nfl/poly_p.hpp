@@ -148,6 +148,13 @@ private:
   ptr_type _p;
 };
 
+/* misc type adaptor
+ */
+template<class T, size_t Degree, size_t AggregatedModulusBitSize>
+using poly_p_from_modulus = poly_p<T, Degree, AggregatedModulusBitSize / params<T>::kModulusBitsize>;
+
+/* stream operator
+ */
 template<class T, size_t Degree, size_t NbModuli>
 std::ostream& operator<<(std::ostream& os, nfl::poly_p<T, Degree, NbModuli> const& p)
 {
