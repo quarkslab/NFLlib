@@ -633,6 +633,7 @@ FastGaussianNoise<in_class, out_class, _lu_depth>::~FastGaussianNoise()
 
   // Free other variables
   mpfr_clear(_const_sigma);
+  mpfr_clear(_center);
   delete[](lu_table);
   if(_lu_depth == 2) 
   {

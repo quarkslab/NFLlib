@@ -5,8 +5,8 @@
 template<size_t degree, size_t modulus, class T>
 bool run()
 {
-  using poly_p = nfl::poly_p<T, degree, modulus>;
-  using poly_t = nfl::poly<T, degree, modulus>;
+  using poly_p = nfl::poly_p_from_modulus<T, degree, modulus>;
+  using poly_t = nfl::poly_from_modulus<T, degree, modulus>;
 
   // Test simple addition
   poly_p a{nfl::uniform()};
