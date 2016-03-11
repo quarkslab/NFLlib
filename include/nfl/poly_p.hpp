@@ -203,8 +203,6 @@ auto SYM(nfl::ops::expr<Op, Args...> const& op0, nfl::poly_p<T, Degree, NbModuli
 
 DECLARE_BINARY_OPERATOR_P(operator-, submod)
 DECLARE_BINARY_OPERATOR_P(operator+, addmod)
-DECLARE_BINARY_OPERATOR_P(operator==, eqmod)
-DECLARE_BINARY_OPERATOR_P(operator!=, neqmod)
 DECLARE_BINARY_OPERATOR_P(operator*, mulmod)
 
 } // nfl
