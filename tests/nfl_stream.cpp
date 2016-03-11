@@ -18,7 +18,7 @@ bool run()
 template<size_t degree, size_t modulus, class T>
 bool run_p()
 {
-  using poly_p = nfl::poly_p<T, degree, modulus>;
+  using poly_p = nfl::poly_p_from_modulus<T, degree, modulus>;
 
   poly_p p;
   p = 1;
