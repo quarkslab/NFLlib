@@ -86,6 +86,13 @@ bool run() {
     }
   }
 
+  // Cleaning
+  free_aligned(1, &p1);
+  free_aligned(1, &p2);
+  free_aligned(1, &p3);
+  free_aligned(1, &p4);
+  free_aligned(1, &p5);
+
   return ret_value;
 }
 
