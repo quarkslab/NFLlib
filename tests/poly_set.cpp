@@ -9,6 +9,10 @@ bool run() {
 
   bool ret_value = true;
 
+  // Set a random number generator
+  // (we don't need a cryptographically secure random number generator)
+  std::srand(std::time(0));
+
   // define a random polynomial
   poly_t& p0 = *alloc_aligned<poly_t, 32>(1, nfl::uniform());
 
@@ -27,20 +31,58 @@ bool run() {
   // verify that the first and second polynomials are equal
   ret_value &= (p0 == p1);
 
-  // construct an array of "degree" random coefficients
-  std::vector<T> small_array(poly_t::degree);
-  std::srand(std::time(
-      0));  // we don't need a cryptographically secure random number generator
-  std::generate(small_array.begin(), small_array.end(), std::rand);
+  // Rerandomize the array
+  std::generate(big_array.begin(), big_array.end(), std::rand);
 
   // define a polynomial from the array
   poly_t& p2 =
+      *alloc_aligned<poly_t, 32>(1, big_array.begin(), big_array.end());
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_t::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_t::degree; i++) {
+      ret_value &=
+          (p2(cm, i) ==
+           big_array[cm * poly_t::degree + i] % poly_t::get_modulus(cm));
+    }
+  }
+
+  // define a polynomial from the array without reducing the coefficients
+  // reduce_coeffs = false
+  poly_t& p3 =
+      *alloc_aligned<poly_t, 32>(1, big_array.begin(), big_array.end(), false);
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_t::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_t::degree; i++) {
+      ret_value &= (p3(cm, i) == big_array[cm * poly_t::degree + i]);
+    }
+  }
+
+  // construct an array of "degree" random coefficients
+  std::vector<T> small_array(poly_t::degree);
+  std::generate(small_array.begin(), small_array.end(), std::rand);
+
+  // define a polynomial from the array
+  poly_t& p4 =
       *alloc_aligned<poly_t, 32>(1, small_array.begin(), small_array.end());
 
   // verify that the coefficients of the polynomial have been set correctly
   for (size_t cm = 0; cm < poly_t::nmoduli; cm++) {
     for (size_t i = 0; i < poly_t::degree; i++) {
-      ret_value &= (p2(cm, i) == small_array[i] % poly_t::get_modulus(cm));
+      ret_value &= (p4(cm, i) == small_array[i] % poly_t::get_modulus(cm));
+    }
+  }
+
+  // define a polynomial from the array without reducing the coefficients
+  // reduce_coeffs = false
+  poly_t& p5 = *alloc_aligned<poly_t, 32>(1, small_array.begin(),
+                                          small_array.end(), false);
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_t::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_t::degree; i++) {
+      ret_value &= (p5(cm, i) == small_array[i]);
     }
   }
 
@@ -52,6 +94,10 @@ bool run_p() {
   using poly_p = nfl::poly_p<T, degree, modulus>;
 
   bool ret_value = true;
+
+  // Set a random number generator
+  // (we don't need a cryptographically secure random number generator)
+  std::srand(std::time(0));
 
   // define a random polynomial
   poly_p p0{nfl::uniform()};
@@ -65,24 +111,59 @@ bool run_p() {
   }
 
   // define a polynomial from the array
-  poly_p p1 = poly_p(big_array.begin(), big_array.end());
+  poly_p p1{big_array.begin(), big_array.end()};
 
   // verify that the first and second polynomials are equal
   ret_value &= (p0 == p1);
 
-  // construct an array of "degree" random coefficients
-  std::vector<T> small_array(poly_p::degree);
-  std::srand(std::time(
-      0));  // we don't need a cryptographically secure random number generator
-  std::generate(small_array.begin(), small_array.end(), std::rand);
+  // Rerandomize the array
+  std::generate(big_array.begin(), big_array.end(), std::rand);
 
   // define a polynomial from the array
-  poly_p p2 = poly_p(small_array.begin(), small_array.end());
+  poly_p p2{big_array.begin(), big_array.end()};
 
   // verify that the coefficients of the polynomial have been set correctly
   for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {
     for (size_t i = 0; i < poly_p::degree; i++) {
-      ret_value &= (p2(cm, i) == small_array[i] % poly_p::get_modulus(cm));
+      ret_value &=
+          (p2(cm, i) ==
+           big_array[cm * poly_p::degree + i] % poly_p::get_modulus(cm));
+    }
+  }
+
+  // define a polynomial from the array without reducing the coefficients
+  // reduce_coeffs = false
+  poly_p p3{big_array.begin(), big_array.end(), false};
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_p::degree; i++) {
+      ret_value &= (p3(cm, i) == big_array[cm * poly_p::degree + i]);
+    }
+  }
+
+  // construct an array of "degree" random coefficients
+  std::vector<T> small_array(poly_p::degree);
+  std::generate(small_array.begin(), small_array.end(), std::rand);
+
+  // define a polynomial from the array
+  poly_p p4{small_array.begin(), small_array.end()};
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_p::degree; i++) {
+      ret_value &= (p4(cm, i) == small_array[i] % poly_p::get_modulus(cm));
+    }
+  }
+
+  // define a polynomial from the array without reducing the coefficients
+  // reduce_coeffs = false
+  poly_p p5{small_array.begin(), small_array.end(), false};
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_p::degree; i++) {
+      ret_value &= (p5(cm, i) == small_array[i]);
     }
   }
 

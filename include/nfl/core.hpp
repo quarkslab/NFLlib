@@ -62,34 +62,34 @@ poly<T, Degree, NbModuli>::poly() : poly(std::integral_constant<T, 0>::value) {
 }
 
 template<class T, size_t Degree, size_t NbModuli>
-poly<T, Degree, NbModuli>::poly(value_type v) {
-  set(v);
+poly<T, Degree, NbModuli>::poly(value_type v, bool reduce_coeffs) {
+  set(v, reduce_coeffs);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
-poly<T, Degree, NbModuli>::poly(std::initializer_list<value_type> values) {
-  set(values);
-}
-
-template<class T, size_t Degree, size_t NbModuli>
-template<class It>
-poly<T, Degree, NbModuli>::poly(It first, It last) {
-  set(first, last);
-}
-
-template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(value_type v) {
-  set({v});
-}
-
-template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values) {
-  set(values.begin(), values.end());
+poly<T, Degree, NbModuli>::poly(std::initializer_list<value_type> values, bool reduce_coeffs) {
+  set(values, reduce_coeffs);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 template<class It>
-void poly<T, Degree, NbModuli>::set(It first, It last) {
+poly<T, Degree, NbModuli>::poly(It first, It last, bool reduce_coeffs) {
+  set(first, last, reduce_coeffs);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set(value_type v, bool reduce_coeffs) {
+  set({v}, reduce_coeffs);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values, bool reduce_coeffs) {
+  set(values.begin(), values.end(), reduce_coeffs);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+template<class It>
+void poly<T, Degree, NbModuli>::set(It first, It last, bool reduce_coeffs) {
   // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
   assert((unsigned long)(this->_data) % 32 == 0);
 
@@ -107,7 +107,14 @@ void poly<T, Degree, NbModuli>::set(It first, It last) {
       for(size_t i = 0; i < degree; i++)
       {
         if (viter < last) {
-          *iter++ = (*viter++) % get_modulus(cm);
+          *iter = *viter;
+          
+          if (reduce_coeffs) {
+            *iter %= get_modulus(cm);
+          }
+
+          iter++;
+          viter++;
         } else {
           *iter++ = 0;
         }
@@ -122,9 +129,19 @@ void poly<T, Degree, NbModuli>::set(It first, It last) {
       std::cerr << "core.hpp: CRITICAL, initializer of size above degree but not equal to nmoduli*degree" << std::endl;
       exit(1);
     }
-    for (size_t i = 0; i < degree*nmoduli; ++i)
+    for(size_t cm = 0; cm < nmoduli; cm++) 
     {
-      *iter++ = *viter++;
+      for(size_t i = 0; i < degree; i++)
+      {
+        *iter = *viter;
+
+        if (reduce_coeffs) {
+          *iter %= get_modulus(cm);
+        }
+        
+        iter++;
+        viter++;
+      }
     }
   }
 }
