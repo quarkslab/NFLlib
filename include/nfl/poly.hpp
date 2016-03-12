@@ -97,20 +97,22 @@ public:
   /* constructors
    */
   poly();
-  poly(value_type v);
+  poly(value_type v, bool reduce_coeffs = true);
   poly(uniform const& mode);
   poly(non_uniform const& mode);
   template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
-  poly(std::initializer_list<value_type> values);
+  poly(std::initializer_list<value_type> values, bool reduce_coeffs = true);
+  template <class It> poly(It first, It last, bool reduce_coeffs = true);
   template<class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
 
-  void set(value_type v);
+  void set(value_type v, bool reduce_coeffs = true);
   void set(uniform const& mode);
   void set(non_uniform const& mode);
   template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode);
   void set(void* mode);
-  void set(std::initializer_list<value_type> values);
-
+  void set(std::initializer_list<value_type> values, bool reduce_coeffs = true);
+  template <class It> void set(It first, It last, bool reduce_coeffs = true);
+  
   /* assignment
    */
   poly& operator=(value_type v) { set(v); return *this; }
@@ -236,16 +238,20 @@ public:
   poly(mpz_t* values);
   poly(mpz_class v);
   poly(mpz_class* values);
+  poly(std::initializer_list<mpz_class> values);
   
-  void set(mpz_t v);
-  void set(mpz_t* values);
-  void set(mpz_class v);
-  void set(mpz_class* values);
+  void set_mpz(mpz_t v);
+  void set_mpz(mpz_t* values);
+  void set_mpz(mpz_class v);
+  void set_mpz(mpz_class* values);
+  void set_mpz(std::initializer_list<mpz_class> values);
+  template<class It> void set_mpz(It first, It last);
   
-  poly& operator=(mpz_t v) { set(v); return *this; }
-  poly& operator=(mpz_t* values) { set(values); return *this; }
-  poly& operator=(mpz_class v) { set(v); return *this; }
-  poly& operator=(mpz_class* values) { set(values); return *this; }
+  poly& operator=(mpz_t v) { set_mpz(v); return *this; }
+  poly& operator=(mpz_t* values) { set_mpz(values); return *this; }
+  poly& operator=(mpz_class v) { set_mpz(v); return *this; }
+  poly& operator=(mpz_class* values) { set_mpz(values); return *this; }
+  poly& operator=(std::initializer_list<mpz_class> values) { set_mpz(values); return *this; }
   
   static GMP gmp;
 
