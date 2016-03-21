@@ -13,11 +13,7 @@ bool run()
   poly_t* resb = alloc_aligned<poly_t, 32>(ITERATIONS, nfl::uniform());
   
   bool ret_value = true;
-  // Simple unitary test
-  // AG: commented because it uses stack variables!
-  //ret_value &= (poly_t{{4,3,2,1}} != poly_t{{5,3,2,1}});
-  
-  // Some more randomized tests
+  // Randomized test
   // if resb[i] is the null polynomial this test fails but 
   // then the uniform generator is wrong or we are extremely unlucky
   for (size_t i = 0 ; i < ITERATIONS; i++)
@@ -29,6 +25,31 @@ bool run()
   return ret_value;
 }
 
+template<size_t degree, size_t modulus, class T>
+bool run_p()
+{
+  using poly_p = nfl::poly_p<T, degree, modulus>;
+
+  poly_p* resa = new poly_p[ITERATIONS];
+  poly_p* resb = new poly_p[ITERATIONS];
+  for (size_t i = 0 ; i < ITERATIONS; i++) {
+    resa[i] = poly_p{nfl::uniform()};
+    resb[i] = poly_p{nfl::uniform()};
+  }
+  
+  bool ret_value = true;
+  // Randomized test
+  // if resb[i] is the null polynomial this test fails but 
+  // then the uniform generator is wrong or we are extremely unlucky
+  for (size_t i = 0 ; i < ITERATIONS; i++)
+    ret_value &= (resa[i] != (resa[i]+resb[i]));
+
+  delete[] resa;
+  delete[] resb;
+
+  return ret_value;
+}
+
 int main(int argc, char const* argv[]) {
-  return not run<CONFIG>() ;
+  return not (run<CONFIG>() and run_p<CONFIG>()) ;
 }
