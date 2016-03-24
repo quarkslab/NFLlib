@@ -23,11 +23,11 @@ bool run()
 template<size_t degree, size_t modulus, class T>
 bool run_p()
 {
-  using poly_p = nfl::poly_p<T, degree, modulus>;
+  using poly_p = nfl::poly_p_from_modulus<T, degree, modulus>;
 
   poly_p* resa = new poly_p[ITERATIONS];
   for (size_t i = 0 ; i < ITERATIONS; i++) {
-    resa[i] = poly_p{nfl::uniform()};
+    resa[i] = nfl::uniform();
   }
   
   bool ret_value = true;
