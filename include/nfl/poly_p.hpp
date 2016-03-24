@@ -16,6 +16,8 @@ public:
   using greater_value_type = typename poly_type::greater_value_type;
   static constexpr size_t nmoduli = poly_type::nmoduli;
   static constexpr size_t degree = poly_type::degree;
+  static constexpr size_t nbits = poly_type::nbits;
+  static constexpr size_t aggregated_modulus_bit_size = poly_type::aggregated_modulus_bit_size;
 
 public:
   poly_p(poly_p const& o):
