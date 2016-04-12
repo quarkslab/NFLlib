@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "nfl/poly.hpp"
+#include "nfl/aligned_allocator.hpp"
 
 namespace nfl {
 
@@ -144,7 +145,8 @@ private:
   template <class... Args>
   static ptr_type make_pointer(Args&& ... args)
   {
-    return std::make_shared<poly_type>(std::forward<Args>(args)...);
+    aligned_allocator<poly_type, 32> alloc; 
+    return std::allocate_shared<poly_type>(alloc, std::forward<Args>(args)...);
   }
 
   void detach()
