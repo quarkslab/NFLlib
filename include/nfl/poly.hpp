@@ -14,8 +14,6 @@
 #ifndef NFL_POLY_HPP
 #define NFL_POLY_HPP
 
-#include <gmpxx.h>
-
 /***
  * Polynomial class for NFL
  *
@@ -32,6 +30,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <gmpxx.h>
 
 
 namespace nfl {
@@ -101,8 +100,8 @@ public:
   poly(uniform const& mode);
   poly(non_uniform const& mode);
   template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
-  poly(std::initializer_list<value_type> values, bool reduce_coeffs = true);
-  template <class It> poly(It first, It last, bool reduce_coeffs = true);
+  poly(std::initializer_list<value_type> values, size_t length = 0, bool reduce_coeffs = true);
+  template <class It> poly(It first, It last, size_t length = 0, bool reduce_coeffs = true);
   template<class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
 
   void set(value_type v, bool reduce_coeffs = true);
@@ -110,8 +109,8 @@ public:
   void set(non_uniform const& mode);
   template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode);
   void set(void* mode);
-  void set(std::initializer_list<value_type> values, bool reduce_coeffs = true);
-  template <class It> void set(It first, It last, bool reduce_coeffs = true);
+  void set(std::initializer_list<value_type> values, size_t length = 0, bool reduce_coeffs = true);
+  template <class It> void set(It first, It last, size_t length = 0, bool reduce_coeffs = true);
   
   /* assignment
    */
@@ -216,7 +215,7 @@ public:
 
     mpz_t   moduli_product;
     mpz_t   modulus_shoup;
-    unsigned bits_in_moduli_product;
+    size_t bits_in_moduli_product;
     mpz_t*  lifting_integers;
 
     /* Constructor & Destructor
@@ -227,33 +226,39 @@ public:
     /* GMP Functions
      */
 
-    mpz_t*  poly2mpz(const poly&);
-    void    poly2mpz(mpz_t*, const poly&);
-    poly    mpz2poly(const mpz_t *);
-    void    mpz2poly(poly&, const mpz_t *);
+    mpz_t*  poly2mpz(poly const&);
+    void    poly2mpz(mpz_t*, poly const&);
+    void    mpz2poly(poly&, mpz_t* const&);
   };
 
-public:
-  poly(mpz_t v);
-  poly(mpz_t* values);
-  poly(mpz_class v);
-  poly(mpz_class* values);
-  poly(std::initializer_list<mpz_class> values);
-  
-  void set_mpz(mpz_t v);
-  void set_mpz(mpz_t* values);
-  void set_mpz(mpz_class v);
-  void set_mpz(mpz_class* values);
-  void set_mpz(std::initializer_list<mpz_class> values);
-  template<class It> void set_mpz(It first, It last);
-  
-  poly& operator=(mpz_t v) { set_mpz(v); return *this; }
-  poly& operator=(mpz_t* values) { set_mpz(values); return *this; }
-  poly& operator=(mpz_class v) { set_mpz(v); return *this; }
-  poly& operator=(mpz_class* values) { set_mpz(values); return *this; }
-  poly& operator=(std::initializer_list<mpz_class> values) { set_mpz(values); return *this; }
-  
   static GMP gmp;
+
+public:
+  poly(mpz_t const& v);
+  poly(mpz_t* const& values, size_t length);
+  poly(mpz_class const& v);
+  poly(mpz_class* const& values, size_t length);
+  poly(std::initializer_list<mpz_class> const& values, size_t length = 0);
+  
+  void set_mpz(mpz_t const& v);
+  void set_mpz(mpz_t* const& values, size_t length);
+  void set_mpz(mpz_class const& v);
+  void set_mpz(mpz_class* const& values, size_t length);
+  void set_mpz(std::initializer_list<mpz_class> const& values, size_t length = 0);
+  template<class It> void set_mpz(It first, It last, size_t length = 0);
+  
+  poly& operator=(mpz_t const& v) { set_mpz(v); return *this; }
+  poly& operator=(mpz_class const& v) { set_mpz(v); return *this; }
+  poly& operator=(std::initializer_list<mpz_class> const& values) { set_mpz(values); return *this; }
+
+  inline mpz_t* poly2mpz() { return gmp.poly2mpz(*this); };
+  inline void poly2mpz(mpz_t* const& array) { gmp.poly2mpz(array, *this); };
+  inline void mpz2poly(mpz_t* const& array) { gmp.mpz2poly(*this, array); };
+  
+  inline static constexpr size_t bits_in_moduli_product() { return gmp.bits_in_moduli_product; };
+  inline static constexpr mpz_t& moduli_product() { return gmp.moduli_product; };
+  inline static constexpr mpz_t& modulus_shoup() { return gmp.modulus_shoup; };
+  inline static constexpr mpz_t* lifting_integers() { return gmp.lifting_integers; };
 
 }  __attribute__((aligned(32)));
 
