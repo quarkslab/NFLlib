@@ -180,9 +180,9 @@ public:
   inline void mpz2poly(mpz_t* const& array) { poly_obj().mpz2poly(array); };
 
   inline static constexpr size_t bits_in_moduli_product() { return poly_type::bits_in_moduli_product(); };
-  inline static constexpr mpz_t& moduli_product() { return poly_obj().moduli_product(); };
-  inline static constexpr mpz_t& modulus_shoup() { return poly_obj().modulus_shoup(); };
-  inline static constexpr mpz_t& lifting_integers() { return poly_obj().lifting_integers(); };
+  inline static constexpr mpz_t& moduli_product() { return poly_type::moduli_product(); };
+  inline static constexpr mpz_t& modulus_shoup() { return poly_type::modulus_shoup(); };
+  inline static constexpr mpz_t& lifting_integers() { return poly_type::lifting_integers(); };
 
 private:
   ptr_type _p;
