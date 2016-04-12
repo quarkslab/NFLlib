@@ -161,6 +161,12 @@ poly<T, Degree, NbModuli>::GMP::~GMP() {
   mpz_clear(moduli_product);
 }
 
+/**
+ * Functions to convert a poly into an array of mpz_t, and back
+ *
+ * The mpz_t array is allocated with new[]
+ */
+
 template <class T, size_t Degree, size_t NbModuli>
 mpz_t* poly<T, Degree, NbModuli>::GMP::poly2mpz(poly const& op) {
   // Assign and init
@@ -203,7 +209,6 @@ void poly<T, Degree, NbModuli>::GMP::poly2mpz(mpz_t* rop, poly const& op) {
 template <class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::GMP::mpz2poly(poly<T, Degree, NbModuli>& rop,
                                               mpz_t* const& poly_mpz) {
-  // rop.set_mpz(poly_mpz, degree);
   for (size_t cm = 0; cm < nmoduli; cm++) {
     for (size_t i = 0; i < degree; i++) {
       rop(cm, i) = mpz_fdiv_ui(poly_mpz[i], params<T>::P[cm]);
