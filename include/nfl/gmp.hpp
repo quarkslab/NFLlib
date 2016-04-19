@@ -54,7 +54,7 @@ template <class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set_mpz(mpz_t* const& values, size_t length) {
   std::vector<mpz_class> v(length);
   for (size_t i = 0; i < length; i++) {
-    v[i] = values[i];
+    v[i] = mpz_class(values[i]);
   }
   set_mpz(v.begin(), v.end(), length);
 }
