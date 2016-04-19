@@ -52,18 +52,18 @@ void poly<T, Degree, NbModuli>::set_mpz(mpz_class const& v) {
  */
 template <class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set_mpz(mpz_t* const& values, size_t length) {
-  std::vector<mpz_class> v;
+  std::vector<mpz_class> v(length);
   for (size_t i = 0; i < length; i++) {
-    v.push_back(mpz_class(values[i]));
+    v[i] = values[i];
   }
   set_mpz(v.begin(), v.end(), length);
 }
 
 template <class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set_mpz(mpz_class* const& values, size_t length) {
-  std::vector<mpz_class> v;
+  std::vector<mpz_class> v(length);
   for (size_t i = 0; i < length; i++) {
-    v.push_back(values[i]);
+    v[i] = values[i];
   }
   set_mpz(v.begin(), v.end(), length);
 }
