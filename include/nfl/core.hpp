@@ -99,11 +99,12 @@ void poly<T, Degree, NbModuli>::set(It first, It last, size_t length, bool reduc
   size_t size = (!length) ? std::distance(first, last) : length;
   // If the initializer has no more values than the polynomial degree use them 
   // to initialize the associated coefficients for each sub-modulus
-  if (size <= degree)
+  // Or, we want to fully define the polynomial
+  if (size <= degree || size == nmoduli*degree)
   {
     for(size_t cm = 0; cm < nmoduli; cm++) 
     {
-      viter = first;
+      viter = (size != nmoduli*degree) ? first : viter;
       for(size_t i = 0; i < degree; i++)
       {
         if (viter < last) {
@@ -123,26 +124,9 @@ void poly<T, Degree, NbModuli>::set(It first, It last, size_t length, bool reduc
   }
   else 
   {
-    // Else we want to fully define the polynomial
-    if (size != nmoduli*degree)
-    {
-      std::cerr << "core.hpp: CRITICAL, initializer of size above degree but not equal to nmoduli*degree" << std::endl;
-      exit(1);
-    }
-    for(size_t cm = 0; cm < nmoduli; cm++) 
-    {
-      for(size_t i = 0; i < degree; i++)
-      {
-        *iter = *viter;
-
-        if (reduce_coeffs) {
-          *iter %= get_modulus(cm);
-        }
-        
-        iter++;
-        viter++;
-      }
-    }
+    throw std::runtime_error(
+        "core: CRITICAL, initializer of size above degree but not equal "
+        "to nmoduli*degree");
   }
 }
 
