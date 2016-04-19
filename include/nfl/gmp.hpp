@@ -1,6 +1,7 @@
 #ifndef NFL_GMP_HPP
 #define NFL_GMP_HPP
 
+#include <vector>
 #include "nfl/poly.hpp"
 
 namespace nfl {
@@ -87,9 +88,8 @@ void poly<T, Degree, NbModuli>::set_mpz(It first, It last, size_t length) {
   // to initialize the associated coefficients for each sub-modulus
   if (size <= degree || size == degree * nmoduli) {
     for (size_t cm = 0; cm < nmoduli; ++cm) {
-      if (size != degree * nmoduli) {
-        viter = first;
-      }
+      viter = (size != degree * nmoduli) ? first : viter;
+
       for (size_t i = 0; i < degree; i++) {
         if (viter < last) {
           *iter++ = mpz_fdiv_ui(viter->get_mpz_t(), params<T>::P[cm]);
@@ -100,7 +100,7 @@ void poly<T, Degree, NbModuli>::set_mpz(It first, It last, size_t length) {
     }
   } else {
     throw std::runtime_error(
-        "gmp.hpp: CRITICAL, initializer of size above degree but different "
+        "gmp: CRITICAL, initializer of size above degree but different "
         "from nmoduli*degree");
   }
 }
