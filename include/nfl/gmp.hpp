@@ -37,6 +37,10 @@ poly<T, Degree, NbModuli>::poly(mpz_class* const& values, size_t length) {
   set_mpz(values, length);
 }
 
+/*
+ * set_mpz's functions
+ */
+
 template <class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set_mpz(mpz_t const& v) {
   set_mpz({mpz_class(v)}, (size_t)1);
@@ -47,11 +51,8 @@ void poly<T, Degree, NbModuli>::set_mpz(mpz_class const& v) {
   set_mpz({v}, (size_t)1);
 }
 
-/*
- * set_mpz's functions
- */
 template <class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set_mpz(mpz_t* const& values, size_t length) {
+void poly<T, Degree, NbModuli>::set_mpz(mpz_t *const &values, size_t length) {
   std::vector<mpz_class> v(length);
   for (size_t i = 0; i < length; i++) {
     v[i] = mpz_class(values[i]);
@@ -105,6 +106,9 @@ void poly<T, Degree, NbModuli>::set_mpz(It first, It last, size_t length) {
   }
 }
 
+/*
+ * Nested GMP class
+ */
 template <class T, size_t Degree, size_t NbModuli>
 poly<T, Degree, NbModuli>::GMP::GMP() {
   // Compute product of moduli
@@ -116,12 +120,13 @@ poly<T, Degree, NbModuli>::GMP::GMP() {
   bits_in_moduli_product = mpz_sizeinbase(moduli_product, 2);
 
   // Compute Shoup value for optimized reduction modulo "moduli_product"
+  auto const shift_modulus_shoup = bits_in_moduli_product +
+                                   sizeof(T) * CHAR_BIT +
+                                   static_log2<nmoduli>::value + 1;
   mpz_t one;
   mpz_init_set_ui(one, 1);
   mpz_init(modulus_shoup);
-  mpz_mul_2exp(modulus_shoup, one, bits_in_moduli_product +
-                                       sizeof(T) * CHAR_BIT +
-                                       params<T>::logkMaxNbModuli + 1);
+  mpz_mul_2exp(modulus_shoup, one, shift_modulus_shoup);
   mpz_tdiv_q(modulus_shoup, modulus_shoup, moduli_product);
 
   // Compute the lifting coefficients
@@ -172,19 +177,25 @@ mpz_t* poly<T, Degree, NbModuli>::GMP::poly2mpz(poly const& op) {
   // Assign and init
   mpz_t* poly_mpz = new mpz_t[degree];
   for (size_t i = 0; i < degree; i++) {
-    mpz_init(poly_mpz[i]);
+    mpz_init2(poly_mpz[i], bits_in_moduli_product);
   }
 
   // Fill
   poly2mpz(poly_mpz, op);
-
   return poly_mpz;
 }
 
 template <class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::GMP::poly2mpz(mpz_t* rop, poly const& op) {
+
+  auto const shift_modulus_shoup = bits_in_moduli_product +
+                                   sizeof(T) * CHAR_BIT +
+                                   static_log2<nmoduli>::value + 1;
+
   mpz_t tmp;
-  mpz_init2(tmp, (bits_in_moduli_product << 2));
+  mpz_init2(tmp, shift_modulus_shoup + static_log2<nmoduli>::value);
+
+  // Loop on each coefficient
   for (size_t i = 0; i < degree; i++) {
     mpz_set_ui(rop[i], 0);
     for (size_t cm = 0; cm < nmoduli; cm++) {
@@ -195,14 +206,15 @@ void poly<T, Degree, NbModuli>::GMP::poly2mpz(mpz_t* rop, poly const& op) {
     }
     // Modular reduction using Shoup
     mpz_mul(tmp, rop[i], modulus_shoup);
-    mpz_tdiv_q_2exp(tmp, tmp, bits_in_moduli_product + sizeof(T) * CHAR_BIT +
-                                  params<T>::logkMaxNbModuli + 1);
+    mpz_tdiv_q_2exp(tmp, tmp, shift_modulus_shoup);
     mpz_mul(tmp, tmp, moduli_product);
     mpz_sub(rop[i], rop[i], tmp);
     if (mpz_cmp(rop[i], moduli_product) >= 0) {
       mpz_sub(rop[i], rop[i], moduli_product);
     }
   }
+
+  // Clean
   mpz_clear(tmp);
 }
 
