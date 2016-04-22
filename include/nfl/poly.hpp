@@ -216,7 +216,7 @@ public:
     mpz_t   moduli_product;
     mpz_t   modulus_shoup;
     size_t bits_in_moduli_product;
-    mpz_t*  lifting_integers;
+    std::array<mpz_t, nmoduli> lifting_integers;
 
     /* Constructor & Destructor
      */
@@ -258,7 +258,7 @@ public:
   inline static constexpr size_t bits_in_moduli_product() { return gmp.bits_in_moduli_product; };
   inline static constexpr mpz_t& moduli_product() { return gmp.moduli_product; };
   inline static constexpr mpz_t& modulus_shoup() { return gmp.modulus_shoup; };
-  inline static constexpr mpz_t* lifting_integers() { return gmp.lifting_integers; };
+  inline static constexpr std::array<mpz_t, nmoduli> lifting_integers() { return gmp.lifting_integers; };
 
 }  __attribute__((aligned(32)));
 

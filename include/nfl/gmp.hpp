@@ -132,8 +132,7 @@ poly<T, Degree, NbModuli>::GMP::GMP() {
   // Compute the lifting coefficients
   mpz_t quotient;
   mpz_init(quotient);
-  lifting_integers = (mpz_t*)malloc(nmoduli * sizeof(mpz_t));
-
+  
   for (size_t i = 0; i < nmoduli; i++) {
     // Current modulus
     mpz_t current_modulus;
@@ -161,7 +160,6 @@ poly<T, Degree, NbModuli>::GMP::~GMP() {
   for (size_t i = 0; i < nmoduli; i++) {
     mpz_clear(lifting_integers[i]);
   }
-  free(lifting_integers);
   mpz_clear(modulus_shoup);
   mpz_clear(moduli_product);
 }
