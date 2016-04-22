@@ -67,36 +67,36 @@ poly<T, Degree, NbModuli>::poly(value_type v, bool reduce_coeffs) {
 }
 
 template<class T, size_t Degree, size_t NbModuli>
-poly<T, Degree, NbModuli>::poly(std::initializer_list<value_type> values, size_t length, bool reduce_coeffs) {
-  set(values, length, reduce_coeffs);
+poly<T, Degree, NbModuli>::poly(std::initializer_list<value_type> values, bool reduce_coeffs) {
+  set(values, reduce_coeffs);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 template<class It>
-poly<T, Degree, NbModuli>::poly(It first, It last, size_t length, bool reduce_coeffs) {
-  set(first, last, length, reduce_coeffs);
+poly<T, Degree, NbModuli>::poly(It first, It last, bool reduce_coeffs) {
+  set(first, last, reduce_coeffs);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(value_type v, bool reduce_coeffs) {
-  set({v}, (size_t)1, reduce_coeffs);
+  set({v}, reduce_coeffs);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values, size_t length, bool reduce_coeffs) {
-  set(values.begin(), values.end(), length, reduce_coeffs);
+void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values, bool reduce_coeffs) {
+  set(values.begin(), values.end(), reduce_coeffs);
 }
 
 template<class T, size_t Degree, size_t NbModuli>
 template<class It>
-void poly<T, Degree, NbModuli>::set(It first, It last, size_t length, bool reduce_coeffs) {
+void poly<T, Degree, NbModuli>::set(It first, It last, bool reduce_coeffs) {
   // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
   assert((unsigned long)(this->_data) % 32 == 0);
 
   auto* iter = begin();
   auto viter = first;
 
-  size_t size = (!length) ? std::distance(first, last) : length;
+  size_t size = std::distance(first, last);
   // If the initializer has no more values than the polynomial degree use them 
   // to initialize the associated coefficients for each sub-modulus
   // Or, we want to fully define the polynomial

@@ -48,10 +48,9 @@ bool run() {
   }
 
   // define a polynomial from the array without reducing the coefficients
-  // do not specify the length (=0)
   // reduce_coeffs = false
   poly_t& p3 =
-      *alloc_aligned<poly_t, 32>(1, big_array.begin(), big_array.end(), 0, false);
+      *alloc_aligned<poly_t, 32>(1, big_array.begin(), big_array.end(), false);
 
   // verify that the coefficients of the polynomial have been set correctly
   for (size_t cm = 0; cm < poly_t::nmoduli; cm++) {
@@ -76,10 +75,9 @@ bool run() {
   }
 
   // define a polynomial from the array without reducing the coefficients
-  // do not specify the lentgh (=0)
   // reduce_coeffs = false
   poly_t& p5 = *alloc_aligned<poly_t, 32>(1, small_array.begin(),
-                                          small_array.end(), 0, false);
+                                          small_array.end(), false);
 
   // verify that the coefficients of the polynomial have been set correctly
   for (size_t cm = 0; cm < poly_t::nmoduli; cm++) {
@@ -142,9 +140,8 @@ bool run_p() {
   }
 
   // define a polynomial from the array without reducing the coefficients
-  // do not specify the length (=0)
   // reduce_coeffs = false
-  poly_p p3{big_array.begin(), big_array.end(), 0, false};
+  poly_p p3{big_array.begin(), big_array.end(), false};
 
   // verify that the coefficients of the polynomial have been set correctly
   for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {
@@ -168,9 +165,8 @@ bool run_p() {
   }
 
   // define a polynomial from the array without reducing the coefficients
-  // do not specify the length (=0)
   // reduce_coeffs = false
-  poly_p p5{small_array.begin(), small_array.end(), 0, false};
+  poly_p p5{small_array.begin(), small_array.end(), false};
 
   // verify that the coefficients of the polynomial have been set correctly
   for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {

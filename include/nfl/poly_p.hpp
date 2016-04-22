@@ -147,8 +147,9 @@ public:
   void set(non_uniform const& mode) { poly_obj().set(mode); };
   template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode) { poly_obj().set(mode); };
   void set(void* mode) { poly_obj().set(mode); };
-  void set(std::initializer_list<value_type> values, size_t length = 0, bool reduce_coeffs = true) { poly_obj().set(values, length, reduce_coeffs); };
-  template <class It> void set(It first, It last, size_t length = 0, bool reduce_coeffs = true) { poly_obj().set(first, last, length, reduce_coeffs); };
+  void set(std::initializer_list<value_type> values, bool reduce_coeffs = true) { poly_obj().set(values, reduce_coeffs); };
+  void set(std::array<value_type, Degree> values, bool reduce_coeffs = true) { poly_obj().set(values, reduce_coeffs); };
+  template <class It> void set(It first, It last, bool reduce_coeffs = true) { poly_obj().set(first, last, reduce_coeffs); };
 
 private:
   template <class... Args>
@@ -169,11 +170,11 @@ private:
 
 public:
   void set_mpz(mpz_t const& v) { poly_obj().set_mpz(v); };
-  void set_mpz(mpz_t* const& values, size_t length) { poly_obj().set_mpz(values, length); };
+  void set_mpz(std::array<mpz_t, Degree> const& values) { poly_obj().set_mpz(values); };
   void set_mpz(mpz_class const& v) { poly_obj().set_mpz(v); };
-  void set_mpz(mpz_class* const& values, size_t length) { poly_obj().set_mpz(values, length); };
-  void set_mpz(std::initializer_list<mpz_class> const& values, size_t length = 0) { poly_obj().set_mpz(values, length); };
-  template<class It> void set_mpz(It first, It last, size_t length = 0) { poly_obj().set_mpz(first, last, length); };
+  void set_mpz(std::array<mpz_class, Degree> const& values) { poly_obj().set_mpz(values); };
+  void set_mpz(std::initializer_list<mpz_class> const& values) { poly_obj().set_mpz(values); };
+  template<class It> void set_mpz(It first, It last) { poly_obj().set_mpz(first, last); };
 
   inline std::array<mpz_t, Degree> poly2mpz() { return poly_obj().poly2mpz(); };
   inline void poly2mpz(std::array<mpz_t, Degree> & array) { poly_obj().poly2mpz(array); };

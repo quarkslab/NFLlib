@@ -96,30 +96,30 @@ public:
   /* constructors
    */
   poly();
-  poly(value_type v, bool reduce_coeffs = true);
   poly(uniform const& mode);
   poly(non_uniform const& mode);
+  poly(value_type v, bool reduce_coeffs = true);
+  poly(std::initializer_list<value_type> values, bool reduce_coeffs = true);
+  template <class It> poly(It first, It last, bool reduce_coeffs = true);
+  template <class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
   template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
-  poly(std::initializer_list<value_type> values, size_t length = 0, bool reduce_coeffs = true);
-  template <class It> poly(It first, It last, size_t length = 0, bool reduce_coeffs = true);
-  template<class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
 
-  void set(value_type v, bool reduce_coeffs = true);
+  void set(void* mode);
   void set(uniform const& mode);
   void set(non_uniform const& mode);
+  void set(value_type v, bool reduce_coeffs = true);
+  void set(std::initializer_list<value_type> values, bool reduce_coeffs = true);
+  template <class It> void set(It first, It last, bool reduce_coeffs = true);
   template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode);
-  void set(void* mode);
-  void set(std::initializer_list<value_type> values, size_t length = 0, bool reduce_coeffs = true);
-  template <class It> void set(It first, It last, size_t length = 0, bool reduce_coeffs = true);
   
   /* assignment
    */
   poly& operator=(value_type v) { set(v); return *this; }
   poly& operator=(uniform const& mode) { set(mode); return *this; }
   poly& operator=(non_uniform const& mode) { set(mode); return *this; }
-  template <class in_class, unsigned _lu_depth> poly& operator=(gaussian<in_class, T, _lu_depth> const& mode) { set(mode); return *this; }
   poly& operator=(std::initializer_list<value_type> values) { set(values); return *this; }
-  template<class Op, class... Args> poly& operator=(ops::expr<Op, Args...> const& expr);
+  template <class in_class, unsigned _lu_depth> poly& operator=(gaussian<in_class, T, _lu_depth> const& mode) { set(mode); return *this; }
+  template <class Op, class... Args> poly& operator=(ops::expr<Op, Args...> const& expr);
 
   /* conversion operators
    */
@@ -235,20 +235,25 @@ public:
 
 public:
   poly(mpz_t const& v);
-  poly(mpz_t* const& values, size_t length);
   poly(mpz_class const& v);
-  poly(mpz_class* const& values, size_t length);
-  poly(std::initializer_list<mpz_class> const& values, size_t length = 0);
+  poly(std::array<mpz_t, Degree> const& values);
+  poly(std::array<mpz_class, Degree> const& values);
+  poly(std::initializer_list<mpz_t> const& values);
+  poly(std::initializer_list<mpz_class> const& values);
   
   void set_mpz(mpz_t const& v);
-  void set_mpz(mpz_t* const& values, size_t length);
   void set_mpz(mpz_class const& v);
-  void set_mpz(mpz_class* const& values, size_t length);
-  void set_mpz(std::initializer_list<mpz_class> const& values, size_t length = 0);
-  template<class It> void set_mpz(It first, It last, size_t length = 0);
+  void set_mpz(std::array<mpz_t, Degree> const& values);
+  void set_mpz(std::array<mpz_class, Degree> const& values);
+  void set_mpz(std::initializer_list<mpz_t> const& values);
+  void set_mpz(std::initializer_list<mpz_class> const& values);
+  template<class It> void set_mpz(It first, It last);
   
   poly& operator=(mpz_t const& v) { set_mpz(v); return *this; }
   poly& operator=(mpz_class const& v) { set_mpz(v); return *this; }
+  poly& operator=(std::array<mpz_t, Degree> const& values) { set_mpz(values); return *this; }
+  poly& operator=(std::array<mpz_class, Degree> const& values) { set_mpz(values); return *this; }
+  poly& operator=(std::initializer_list<mpz_t> const& values) { set_mpz(values); return *this; }
   poly& operator=(std::initializer_list<mpz_class> const& values) { set_mpz(values); return *this; }
 
   inline std::array<mpz_t, Degree> poly2mpz() { return gmp.poly2mpz(*this); };
