@@ -166,14 +166,12 @@ poly<T, Degree, NbModuli>::GMP::~GMP() {
 
 /**
  * Functions to convert a poly into an array of mpz_t, and back
- *
- * The mpz_t array is allocated with new[]
  */
 
 template <class T, size_t Degree, size_t NbModuli>
-mpz_t* poly<T, Degree, NbModuli>::GMP::poly2mpz(poly const& op) {
+std::array<mpz_t, Degree> poly<T, Degree, NbModuli>::GMP::poly2mpz(poly const& op) {
   // Assign and init
-  mpz_t* poly_mpz = new mpz_t[degree];
+  std::array<mpz_t, Degree> poly_mpz;
   for (size_t i = 0; i < degree; i++) {
     mpz_init2(poly_mpz[i], bits_in_moduli_product);
   }
@@ -184,7 +182,7 @@ mpz_t* poly<T, Degree, NbModuli>::GMP::poly2mpz(poly const& op) {
 }
 
 template <class T, size_t Degree, size_t NbModuli>
-void poly<T, Degree, NbModuli>::GMP::poly2mpz(mpz_t* rop, poly const& op) {
+void poly<T, Degree, NbModuli>::GMP::poly2mpz(std::array<mpz_t, Degree>& rop, poly const& op) {
 
   auto const shift_modulus_shoup = bits_in_moduli_product +
                                    sizeof(T) * CHAR_BIT +
@@ -218,7 +216,7 @@ void poly<T, Degree, NbModuli>::GMP::poly2mpz(mpz_t* rop, poly const& op) {
 
 template <class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::GMP::mpz2poly(poly<T, Degree, NbModuli>& rop,
-                                              mpz_t* const& poly_mpz) {
+                                              std::array<mpz_t, Degree> const& poly_mpz) {
   for (size_t cm = 0; cm < nmoduli; cm++) {
     for (size_t i = 0; i < degree; i++) {
       rop(cm, i) = mpz_fdiv_ui(poly_mpz[i], params<T>::P[cm]);

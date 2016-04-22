@@ -19,7 +19,7 @@ bool run() {
   poly_t& p0 = *alloc_aligned<poly_t, 32>(1, nfl::uniform());
 
   // get the corresponding array of mpz_t
-  mpz_t* coefficients = p0.poly2mpz();
+  std::array<mpz_t, degree> coefficients = p0.poly2mpz();
 
   // construct a polynomial from mpz_t coefficients
   poly_t& p1 = *alloc_aligned<poly_t, 32>(1, 0);
@@ -67,7 +67,6 @@ bool run() {
   for (size_t i = 0; i < poly_t::degree; i++) {
     mpz_clear(coefficients[i]);
   }
-  delete[] coefficients;
   free_aligned(1, &p0);
   free_aligned(1, &p1);
   free_aligned(1, &p2);
@@ -91,7 +90,7 @@ bool run_p() {
   poly_p p0{nfl::uniform()};
 
   // get the corresponding array of mpz_t
-  mpz_t* coefficients = p0.poly2mpz();
+  std::array<mpz_t, degree> coefficients = p0.poly2mpz();
 
   // construct a polynomial from mpz_t coefficients
   poly_p p1;
@@ -139,7 +138,6 @@ bool run_p() {
   for (size_t i = 0; i < poly_p::degree; i++) {
     mpz_clear(coefficients[i]);
   }
-  delete[] coefficients;
 
   return ret_value;
 }

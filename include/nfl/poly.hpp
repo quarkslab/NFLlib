@@ -226,9 +226,9 @@ public:
     /* GMP Functions
      */
 
-    mpz_t*  poly2mpz(poly const&);
-    void    poly2mpz(mpz_t*, poly const&);
-    void    mpz2poly(poly&, mpz_t* const&);
+    std::array<mpz_t, Degree>  poly2mpz(poly const&);
+    void    poly2mpz(std::array<mpz_t, Degree>&, poly const&);
+    void    mpz2poly(poly&, std::array<mpz_t, Degree> const&);
   };
 
   static GMP gmp;
@@ -251,9 +251,9 @@ public:
   poly& operator=(mpz_class const& v) { set_mpz(v); return *this; }
   poly& operator=(std::initializer_list<mpz_class> const& values) { set_mpz(values); return *this; }
 
-  inline mpz_t* poly2mpz() { return gmp.poly2mpz(*this); };
-  inline void poly2mpz(mpz_t* const& array) { gmp.poly2mpz(array, *this); };
-  inline void mpz2poly(mpz_t* const& array) { gmp.mpz2poly(*this, array); };
+  inline std::array<mpz_t, Degree> poly2mpz() { return gmp.poly2mpz(*this); };
+  inline void poly2mpz(std::array<mpz_t, Degree> const& array) { gmp.poly2mpz(array, *this); };
+  inline void mpz2poly(std::array<mpz_t, Degree> const& array) { gmp.mpz2poly(*this, array); };
   
   inline static constexpr size_t bits_in_moduli_product() { return gmp.bits_in_moduli_product; };
   inline static constexpr mpz_t& moduli_product() { return gmp.moduli_product; };

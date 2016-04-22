@@ -175,9 +175,9 @@ public:
   void set_mpz(std::initializer_list<mpz_class> const& values, size_t length = 0) { poly_obj().set_mpz(values, length); };
   template<class It> void set_mpz(It first, It last, size_t length = 0) { poly_obj().set_mpz(first, last, length); };
 
-  inline mpz_t* poly2mpz() { return poly_obj().poly2mpz(); };
-  inline void poly2mpz(mpz_t* const& array) { poly_obj().poly2mpz(array); };
-  inline void mpz2poly(mpz_t* const& array) { poly_obj().mpz2poly(array); };
+  inline std::array<mpz_t, Degree> poly2mpz() { return poly_obj().poly2mpz(); };
+  inline void poly2mpz(std::array<mpz_t, Degree> const& array) { poly_obj().poly2mpz(array); };
+  inline void mpz2poly(std::array<mpz_t, Degree> const& array) { poly_obj().mpz2poly(array); };
 
   inline static constexpr size_t bits_in_moduli_product() { return poly_type::bits_in_moduli_product(); };
   inline static constexpr mpz_t& moduli_product() { return poly_type::moduli_product(); };
