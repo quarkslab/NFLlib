@@ -252,7 +252,7 @@ public:
   poly& operator=(std::initializer_list<mpz_class> const& values) { set_mpz(values); return *this; }
 
   inline std::array<mpz_t, Degree> poly2mpz() { return gmp.poly2mpz(*this); };
-  inline void poly2mpz(std::array<mpz_t, Degree> const& array) { gmp.poly2mpz(array, *this); };
+  inline void poly2mpz(std::array<mpz_t, Degree> & array) { gmp.poly2mpz(array, *this); };
   inline void mpz2poly(std::array<mpz_t, Degree> const& array) { gmp.mpz2poly(*this, array); };
   
   inline static constexpr size_t bits_in_moduli_product() { return gmp.bits_in_moduli_product; };
