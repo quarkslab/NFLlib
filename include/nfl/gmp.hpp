@@ -73,28 +73,34 @@ void poly<T, Degree, NbModuli>::set_mpz(It first, It last) {
   // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
   assert((unsigned long)(this->_data) % 32 == 0);
 
+  // The initializer needs to have either less values than the polynomial degree
+  // (and the remaining coefficients are set to 0), or be fully defined (i.e.
+  // the degree*nmoduli coefficients needs to be provided)
+  size_t size = std::distance(first, last);
+  if (size > degree && size != degree * nmoduli) {
+    throw std::runtime_error(
+        "gmp: CRITICAL, initializer of size above degree but not equal "
+        "to nmoduli*degree");
+  }
+
   auto* iter = begin();
   auto viter = first;
 
-  size_t size = std::distance(first, last);
-  // If the initializer has no more values than the polynomial degree use them
-  // to initialize the associated coefficients for each sub-modulus
-  if (size <= degree || size == degree * nmoduli) {
-    for (size_t cm = 0; cm < nmoduli; ++cm) {
-      viter = (size != degree * nmoduli) ? first : viter;
+  for (size_t cm = 0; cm < nmoduli; cm++) {
+    auto const p = get_modulus(cm);
 
-      for (size_t i = 0; i < degree; i++) {
-        if (viter < last) {
-          *iter++ = mpz_fdiv_ui(viter->get_mpz_t(), params<T>::P[cm]);
-          viter++;
-        } else
-          *iter++ = 0;
-      }
+    if (size != degree * nmoduli) viter = first;
+
+    // set the coefficients
+    size_t i = 0;
+    for (; i < degree && viter < last; ++i, ++viter, ++iter) {
+      *iter = mpz_fdiv_ui(viter->get_mpz_t(), p);
     }
-  } else {
-    throw std::runtime_error(
-        "gmp: CRITICAL, initializer of size above degree but different "
-        "from nmoduli*degree");
+
+    // pad with zeroes if needed
+    for (; i < degree; ++i, ++iter) {
+      *iter = 0;
+    }
   }
 }
 
@@ -211,7 +217,7 @@ void poly<T, Degree, NbModuli>::GMP::mpz2poly(poly<T, Degree, NbModuli>& rop,
                                               std::array<mpz_t, Degree> const& poly_mpz) {
   for (size_t cm = 0; cm < nmoduli; cm++) {
     for (size_t i = 0; i < degree; i++) {
-      rop(cm, i) = mpz_fdiv_ui(poly_mpz[i], params<T>::P[cm]);
+      rop(cm, i) = mpz_fdiv_ui(poly_mpz[i], get_modulus(cm));
     }
   }
 }

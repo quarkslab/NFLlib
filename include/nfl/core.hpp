@@ -79,7 +79,14 @@ poly<T, Degree, NbModuli>::poly(It first, It last, bool reduce_coeffs) {
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(value_type v, bool reduce_coeffs) {
-  set({v}, reduce_coeffs);
+  if (v == 0) {
+    // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
+    assert((unsigned long)(this->_data) % 32 == 0);
+    for (auto* iter = begin(); iter<end(); ++iter) *iter = 0;
+  }
+  else {
+    set({v}, reduce_coeffs);
+  }
 }
 
 template<class T, size_t Degree, size_t NbModuli>
@@ -87,46 +94,40 @@ void poly<T, Degree, NbModuli>::set(std::initializer_list<value_type> values, bo
   set(values.begin(), values.end(), reduce_coeffs);
 }
 
-template<class T, size_t Degree, size_t NbModuli>
-template<class It>
+template <class T, size_t Degree, size_t NbModuli>
+template <class It>
 void poly<T, Degree, NbModuli>::set(It first, It last, bool reduce_coeffs) {
   // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
   assert((unsigned long)(this->_data) % 32 == 0);
 
-  auto* iter = begin();
-  auto viter = first;
-
+  // The initializer needs to have either less values than the polynomial degree
+  // (and the remaining coefficients are set to 0), or be fully defined (i.e.
+  // the degree*nmoduli coefficients needs to be provided)
   size_t size = std::distance(first, last);
-  // If the initializer has no more values than the polynomial degree use them 
-  // to initialize the associated coefficients for each sub-modulus
-  // Or, we want to fully define the polynomial
-  if (size <= degree || size == nmoduli*degree)
-  {
-    for(size_t cm = 0; cm < nmoduli; cm++) 
-    {
-      viter = (size != nmoduli*degree) ? first : viter;
-      for(size_t i = 0; i < degree; i++)
-      {
-        if (viter < last) {
-          *iter = *viter;
-          
-          if (reduce_coeffs) {
-            *iter %= get_modulus(cm);
-          }
-
-          iter++;
-          viter++;
-        } else {
-          *iter++ = 0;
-        }
-      }
-    }
-  }
-  else 
-  {
+  if (size > degree && size != degree * nmoduli) {
     throw std::runtime_error(
         "core: CRITICAL, initializer of size above degree but not equal "
         "to nmoduli*degree");
+  }
+
+  auto* iter = begin();
+  auto viter = first;
+
+  for (size_t cm = 0; cm < nmoduli; cm++) {
+    auto const p = get_modulus(cm);
+
+    if (size != degree * nmoduli) viter = first;
+
+    // set the coefficients
+    size_t i = 0;
+    for (; i < degree && viter < last; ++i, ++viter, ++iter) {
+      *iter = reduce_coeffs ? (*viter) % p : *viter;
+    }
+
+    // pad with zeroes if needed
+    for (; i < degree; ++i, ++iter) {
+      *iter = 0;
+    }
   }
 }
 
@@ -517,7 +518,7 @@ template<class T, size_t Degree, size_t NbModuli> inline bool poly<T, Degree, Nb
 // It is used by initialize() and results are used by ntt and inv_ntt
 template<class T, size_t Degree, size_t NbModuli> inline void poly<T, Degree, NbModuli>::core::prep_wtab(value_type* wtab, value_type* wtabshoup, value_type w, size_t cm)
 {
-  auto const p = params<T>::P[cm];
+  auto const p = get_modulus(cm);
   unsigned K = degree;
 
   while (K >= 2)
@@ -593,7 +594,7 @@ template<class T, size_t Degree, size_t NbModuli> void  poly<T, Degree, NbModuli
     // log2(X/2)-log2(degree) times
     phi = params<T>::primitive_roots[currentModulus];
     for (unsigned int i = 0 ;
-        i < log2(params<T>::kMaxPolyDegree) - log2(degree) ; i++)
+        i < static_log2<params<T>::kMaxPolyDegree>::value - static_log2<degree>::value ; i++)
     {
       phi = ops::mulmod<T, simd::serial>{}(phi, phi, currentModulus);
     }
