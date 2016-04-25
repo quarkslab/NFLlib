@@ -104,7 +104,6 @@ public:
   template <class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
   template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
 
-  void set(void* mode);
   void set(uniform const& mode);
   void set(non_uniform const& mode);
   void set(value_type v, bool reduce_coeffs = true);

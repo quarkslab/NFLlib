@@ -146,7 +146,6 @@ public:
   void set(uniform const& mode) { poly_obj().set(mode); };
   void set(non_uniform const& mode) { poly_obj().set(mode); };
   template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode) { poly_obj().set(mode); };
-  void set(void* mode) { poly_obj().set(mode); };
   void set(std::initializer_list<value_type> values, bool reduce_coeffs = true) { poly_obj().set(values, reduce_coeffs); };
   void set(std::array<value_type, Degree> values, bool reduce_coeffs = true) { poly_obj().set(values, reduce_coeffs); };
   template <class It> void set(It first, It last, bool reduce_coeffs = true) { poly_obj().set(first, last, reduce_coeffs); };
