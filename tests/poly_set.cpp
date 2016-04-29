@@ -86,6 +86,16 @@ bool run() {
     }
   }
 
+  // define the zero polynomial
+  poly_t& p6 = *alloc_aligned<poly_t, 32>(1, 0);
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_t::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_t::degree; i++) {
+      ret_value &= (p6(cm, i) == 0);
+    }
+  }
+
   // Cleaning
   free_aligned(1, &p0);
   free_aligned(1, &p1);
@@ -93,6 +103,7 @@ bool run() {
   free_aligned(1, &p3);
   free_aligned(1, &p4);
   free_aligned(1, &p5);
+  free_aligned(1, &p6);
 
   return ret_value;
 }
@@ -172,6 +183,16 @@ bool run_p() {
   for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {
     for (size_t i = 0; i < poly_p::degree; i++) {
       ret_value &= (p5(cm, i) == small_array[i]);
+    }
+  }
+
+  // define the zero polynomial
+  poly_p p6{0};
+
+  // verify that the coefficients of the polynomial have been set correctly
+  for (size_t cm = 0; cm < poly_p::nmoduli; cm++) {
+    for (size_t i = 0; i < poly_p::degree; i++) {
+      ret_value &= (p6(cm, i) == 0);
     }
   }
 

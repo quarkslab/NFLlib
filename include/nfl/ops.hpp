@@ -190,33 +190,14 @@ struct mulmod<T, simd::serial> {
     ASSERT_STRICTMOD((x<p) && (y<p));
     using greater_value_type = typename params<T>::greater_value_type;
     greater_value_type res = (greater_value_type) (x) * y;
-    res=res%p;
+    res = res % p;
     ASSERT_STRICTMOD(res == ((greater_value_type)(x) * y) % p);
     return res;
   }
 };
-// Multiplications
-// Trivial (and very costly) modular multiplication with division
-// OUTPUT: x * y mod p
-// template<>
-// struct mulmod<uint64_t, simd::serial> {
-//   using simd_mode = simd::serial;
-//   uint64_t operator()(uint64_t x, uint64_t y, size_t cm) const
-//   {
-//     using greater_value_type = typename params<uint64_t>::greater_value_type;
-//     auto const p = params<uint64_t>::P[cm];
-//     auto const pn = params<uint64_t>::Pn[cm];
-//     ASSERT_STRICTMOD((x<p) && (y<p));
-//     greater_value_type res = (greater_value_type)x * y;
-//     greater_value_type q = (((greater_value_type)pn * (res >> 64)) >> 64) + (res>>62) ;
-//     uint64_t r  = res - q * p;
-//     if (r>=p) { r -= p; }
-//     if (r>=p) { r -= p; }
-//     ASSERT_STRICTMOD(r == ((greater_value_type)(x) * y) % p);
-//     return r;
-//   }
-// };
-#if 1
+
+// Modular multiplication
+// (Specialization for 64-bit integers)
 template<>
 struct mulmod<uint64_t, simd::serial> {
   using simd_mode = simd::serial;
@@ -236,32 +217,6 @@ struct mulmod<uint64_t, simd::serial> {
     return r;
   }
 };
-#endif
-// Algo 4
-// template<>
-// struct mulmod<uint64_t, simd::serial> {
-//   using simd_mode = simd::serial;
-//   uint64_t operator()(uint64_t x, uint64_t y, size_t cm) const
-//   {
-//     using greater_value_type = typename params<uint64_t>::greater_value_type;
-//     uint64_t const p = params<uint64_t>::P[cm];
-//     uint64_t const p4 = params<uint64_t>::P4[cm];
-//     ASSERT_STRICTMOD((x<p) && (y<p));
-//     greater_value_type res = (greater_value_type)x * y;
-//     greater_value_type q = (greater_value_type) (res >> 64) * params<uint64_t>::P4n[cm];
-//     q += res;
-//     uint64_t q1 = (q>>64)+1;
-//     uint64_t r  = ((uint64_t)res) - q1 * p4;
-//     if ( r>((uint64_t)res) ) { r += p4; }
-//     if ( r>=p4 ) { r -= p4; }
-//     if ( r>=p ) { r -= p; }
-//     if ( r>=p ) { r -= p; }
-//     if ( r>=p ) { r -= p; }
-//     ASSERT_STRICTMOD(r == ((greater_value_type)(x) * y) % p);
-//     return r;
-//   }
-// };
-
 
 // Modular multiplication: much faster alternative
 // Works only if yshoup = ((uint128_t) y << 64) / p (for T=uint64_t)

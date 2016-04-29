@@ -30,6 +30,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <gmpxx.h>
+#include <array>
 
 
 namespace nfl {
@@ -95,30 +97,29 @@ public:
   /* constructors
    */
   poly();
-  poly(value_type v, bool reduce_coeffs = true);
   poly(uniform const& mode);
   poly(non_uniform const& mode);
-  template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
+  poly(value_type v, bool reduce_coeffs = true);
   poly(std::initializer_list<value_type> values, bool reduce_coeffs = true);
   template <class It> poly(It first, It last, bool reduce_coeffs = true);
-  template<class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
+  template <class Op, class... Args> poly(ops::expr<Op, Args...> const& expr);
+  template <class in_class, unsigned _lu_depth> poly(gaussian<in_class, T, _lu_depth> const& mode);
 
-  void set(value_type v, bool reduce_coeffs = true);
   void set(uniform const& mode);
   void set(non_uniform const& mode);
-  template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode);
-  void set(void* mode);
+  void set(value_type v, bool reduce_coeffs = true);
   void set(std::initializer_list<value_type> values, bool reduce_coeffs = true);
   template <class It> void set(It first, It last, bool reduce_coeffs = true);
+  template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode);
   
   /* assignment
    */
   poly& operator=(value_type v) { set(v); return *this; }
   poly& operator=(uniform const& mode) { set(mode); return *this; }
   poly& operator=(non_uniform const& mode) { set(mode); return *this; }
-  template <class in_class, unsigned _lu_depth> poly& operator=(gaussian<in_class, T, _lu_depth> const& mode) { set(mode); return *this; }
   poly& operator=(std::initializer_list<value_type> values) { set(values); return *this; }
-  template<class Op, class... Args> poly& operator=(ops::expr<Op, Args...> const& expr);
+  template <class in_class, unsigned _lu_depth> poly& operator=(gaussian<in_class, T, _lu_depth> const& mode) { set(mode); return *this; }
+  template <class Op, class... Args> poly& operator=(ops::expr<Op, Args...> const& expr);
 
   /* conversion operators
    */
@@ -206,6 +207,64 @@ public:
 
   static core base;
 
+  protected:
+  // NTT-based Fast Lattice library GMP class
+  class GMP {
+
+  public:
+
+    mpz_t   moduli_product;
+    mpz_t   modulus_shoup;
+    size_t bits_in_moduli_product;
+    std::array<mpz_t, nmoduli> lifting_integers;
+
+    /* Constructor & Destructor
+     */
+    GMP();
+    ~GMP();
+
+    /* GMP Functions
+     */
+
+    std::array<mpz_t, Degree>  poly2mpz(poly const&);
+    void    poly2mpz(std::array<mpz_t, Degree>&, poly const&);
+    void    mpz2poly(poly&, std::array<mpz_t, Degree> const&);
+  };
+
+  static GMP gmp;
+
+public:
+  poly(mpz_t const& v);
+  poly(mpz_class const& v);
+  poly(std::array<mpz_t, Degree> const& values);
+  poly(std::array<mpz_class, Degree> const& values);
+  poly(std::initializer_list<mpz_t> const& values);
+  poly(std::initializer_list<mpz_class> const& values);
+  
+  void set_mpz(mpz_t const& v);
+  void set_mpz(mpz_class const& v);
+  void set_mpz(std::array<mpz_t, Degree> const& values);
+  void set_mpz(std::array<mpz_class, Degree> const& values);
+  void set_mpz(std::initializer_list<mpz_t> const& values);
+  void set_mpz(std::initializer_list<mpz_class> const& values);
+  template<class It> void set_mpz(It first, It last);
+  
+  poly& operator=(mpz_t const& v) { set_mpz(v); return *this; }
+  poly& operator=(mpz_class const& v) { set_mpz(v); return *this; }
+  poly& operator=(std::array<mpz_t, Degree> const& values) { set_mpz(values); return *this; }
+  poly& operator=(std::array<mpz_class, Degree> const& values) { set_mpz(values); return *this; }
+  poly& operator=(std::initializer_list<mpz_t> const& values) { set_mpz(values); return *this; }
+  poly& operator=(std::initializer_list<mpz_class> const& values) { set_mpz(values); return *this; }
+
+  inline std::array<mpz_t, Degree> poly2mpz() { return gmp.poly2mpz(*this); };
+  inline void poly2mpz(std::array<mpz_t, Degree> & array) { gmp.poly2mpz(array, *this); };
+  inline void mpz2poly(std::array<mpz_t, Degree> const& array) { gmp.mpz2poly(*this, array); };
+  
+  inline static constexpr size_t bits_in_moduli_product() { return gmp.bits_in_moduli_product; };
+  inline static constexpr mpz_t& moduli_product() { return gmp.moduli_product; };
+  inline static constexpr mpz_t& modulus_shoup() { return gmp.modulus_shoup; };
+  inline static constexpr std::array<mpz_t, nmoduli> lifting_integers() { return gmp.lifting_integers; };
+
 }  __attribute__((aligned(32)));
 
 
@@ -254,5 +313,6 @@ DECLARE_UNARY_OPERATOR(compute_shoup, compute_shoup)
 }
 
 #include "nfl/core.hpp"
+#include "nfl/gmp.hpp"
 
 #endif

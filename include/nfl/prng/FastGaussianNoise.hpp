@@ -67,8 +67,8 @@ class FastGaussianNoise {
 
   public:
     static const unsigned int default_k;
-    FastGaussianNoise(double sigma, unsigned int security, unsigned int samples, double center_d = 0, bool verbose = true);
-    FastGaussianNoise(double sigma, unsigned int security, unsigned int samples, mpfr_t center, bool verbose = true);
+    FastGaussianNoise(double sigma, unsigned int security, unsigned int samples, double center_d = 0, bool verbose = false);
+    FastGaussianNoise(double sigma, unsigned int security, unsigned int samples, mpfr_t center, bool verbose = false);
     ~FastGaussianNoise();
     void getNoise(out_class * const rand_data2out, uint64_t rlen); 
 };

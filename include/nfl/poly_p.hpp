@@ -141,6 +141,15 @@ public:
   void ntt_pow_phi() { poly_obj().ntt_pow_phi();}
   void invntt_pow_invphi() { poly_obj().invntt_pow_invphi(); }
 
+  /* set */
+  void set(value_type v, bool reduce_coeffs = true) { poly_obj().set(v, reduce_coeffs); };
+  void set(uniform const& mode) { poly_obj().set(mode); };
+  void set(non_uniform const& mode) { poly_obj().set(mode); };
+  template <class in_class, unsigned _lu_depth> void set(gaussian<in_class, T, _lu_depth> const& mode) { poly_obj().set(mode); };
+  void set(std::initializer_list<value_type> values, bool reduce_coeffs = true) { poly_obj().set(values, reduce_coeffs); };
+  void set(std::array<value_type, Degree> values, bool reduce_coeffs = true) { poly_obj().set(values, reduce_coeffs); };
+  template <class It> void set(It first, It last, bool reduce_coeffs = true) { poly_obj().set(first, last, reduce_coeffs); };
+
 private:
   template <class... Args>
   static ptr_type make_pointer(Args&& ... args)
@@ -157,6 +166,23 @@ private:
       _p = make_pointer(*_p);
     }
   }
+
+public:
+  void set_mpz(mpz_t const& v) { poly_obj().set_mpz(v); };
+  void set_mpz(std::array<mpz_t, Degree> const& values) { poly_obj().set_mpz(values); };
+  void set_mpz(mpz_class const& v) { poly_obj().set_mpz(v); };
+  void set_mpz(std::array<mpz_class, Degree> const& values) { poly_obj().set_mpz(values); };
+  void set_mpz(std::initializer_list<mpz_class> const& values) { poly_obj().set_mpz(values); };
+  template<class It> void set_mpz(It first, It last) { poly_obj().set_mpz(first, last); };
+
+  inline std::array<mpz_t, Degree> poly2mpz() { return poly_obj().poly2mpz(); };
+  inline void poly2mpz(std::array<mpz_t, Degree> & array) { poly_obj().poly2mpz(array); };
+  inline void mpz2poly(std::array<mpz_t, Degree> const& array) { poly_obj().mpz2poly(array); };
+
+  inline static constexpr size_t bits_in_moduli_product() { return poly_type::bits_in_moduli_product(); };
+  inline static constexpr mpz_t& moduli_product() { return poly_type::moduli_product(); };
+  inline static constexpr mpz_t& modulus_shoup() { return poly_type::modulus_shoup(); };
+  inline static constexpr std::array<mpz_t, nmoduli> lifting_integers() { return poly_type::lifting_integers(); };
 
 private:
   ptr_type _p;
