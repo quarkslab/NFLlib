@@ -31,6 +31,7 @@
 #include <iostream>
 #include <algorithm>
 #include <gmpxx.h>
+#include <array>
 
 
 namespace nfl {

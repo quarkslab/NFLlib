@@ -82,7 +82,7 @@ void poly<T, Degree, NbModuli>::set(value_type v, bool reduce_coeffs) {
   if (v == 0) {
     // CRITICAL: the object must be 32-bytes aligned to avoid vectorization issues
     assert((unsigned long)(this->_data) % 32 == 0);
-    for (auto* iter = begin(); iter<end(); ++iter) *iter = 0;
+    std::fill(begin(), end(), 0);
   }
   else {
     set({v}, reduce_coeffs);
