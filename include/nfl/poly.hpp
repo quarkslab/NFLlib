@@ -151,6 +151,12 @@ public:
   void ntt_pow_phi() { base.ntt_pow_phi(*this);}
   void invntt_pow_invphi() { base.invntt_pow_invphi(*this); }
 
+  /* serializer (cereal)
+  */
+  template<class Archive> void serialize(Archive & archive) { 
+    archive( _data ); // serialize coefficients by passing them to the archive
+  }
+
   protected:
   // NTT-based Fast Lattice library main class
   // - degree is the degree of the quotient polynomial in the ring, it must

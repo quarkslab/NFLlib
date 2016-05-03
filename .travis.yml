@@ -20,6 +20,7 @@ env:
     - NFL_CXX=clang++-3.5 NFL_OPTIMIZED=OFF
 
 script:
-    - cmake . -DNFL_OPTIMIZED=$NFL_OPTIMIZED -DCMAKE_CXX_COMPILER=$NFL_CXX -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/install
+    - git clone https://github.com/USCiLab/cereal
+    - cmake . -DNFL_OPTIMIZED=$NFL_OPTIMIZED -DCMAKE_CXX_COMPILER=$NFL_CXX -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/install -DCEREAL_PREFIX=$PWD/cereal
     - make && make test ARGS="-VV" && make install
 

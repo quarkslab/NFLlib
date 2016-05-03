@@ -13,6 +13,12 @@ set(CONFIGS
     "8, 60, uint32_t"
 )
 
+find_package(CEREAL)
+if(CEREAL_FOUND)
+MESSAGE(STATUS "Found CEREAL: ${CEREAL_INCLUDE_DIR}")
+include_directories(${CEREAL_INCLUDE_DIR})
+endif()
+
 #always double check during tests
 add_definitions(-DCHECK_STRICTMOD)
 
@@ -36,6 +42,16 @@ foreach(CONFIG ${CONFIGS})
         target_link_libraries(${OP}${CONFIG_ID}_${VERSION} nfllib)
         add_test(run_${OP}${CONFIG_ID}_${VERSION} ${OP}${CONFIG_ID}_${VERSION})
     endforeach()
+
+    if(CEREAL_FOUND)
+        foreach(OP poly_serialize)
+            file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp"
+                "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/${OP}.cpp\"\n")
+            add_executable(${OP}${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp)
+            target_link_libraries(${OP}${CONFIG_ID}_${VERSION} nfllib)
+            add_test(run_${OP}${CONFIG_ID}_${VERSION} ${OP}${CONFIG_ID}_${VERSION})
+        endforeach() 
+    endif()
 
 endforeach()
 
