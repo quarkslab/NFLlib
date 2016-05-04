@@ -36,21 +36,23 @@ foreach(CONFIG ${CONFIGS})
     endforeach()
 
     foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p poly_set poly_mpz)
+
         file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp"
             "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/${OP}.cpp\"\n")
         add_executable(${OP}${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp)
         target_link_libraries(${OP}${CONFIG_ID}_${VERSION} nfllib)
         add_test(run_${OP}${CONFIG_ID}_${VERSION} ${OP}${CONFIG_ID}_${VERSION})
+        
     endforeach()
 
     if(CEREAL_FOUND)
-        foreach(OP poly_serialize)
-            file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp"
-                "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/${OP}.cpp\"\n")
-            add_executable(${OP}${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp)
-            target_link_libraries(${OP}${CONFIG_ID}_${VERSION} nfllib)
-            add_test(run_${OP}${CONFIG_ID}_${VERSION} ${OP}${CONFIG_ID}_${VERSION})
-        endforeach() 
+
+        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/poly_serialize${CONFIG_ID}_${VERSION}.cpp"
+            "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/poly_serialize.cpp\"\n")
+        add_executable(poly_serialize${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/poly_serialize${CONFIG_ID}_${VERSION}.cpp)
+        target_link_libraries(poly_serialize${CONFIG_ID}_${VERSION} nfllib)
+        add_test(run_poly_serialize${CONFIG_ID}_${VERSION} poly_serialize${CONFIG_ID}_${VERSION})
+
     endif()
 
 endforeach()
