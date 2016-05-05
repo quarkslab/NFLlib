@@ -21,18 +21,24 @@ bool run() {
   // serialize the polynomial
   oarchive(p0);
 
-  // define a new polynomial
-  poly_t& p1 = *alloc_aligned<poly_t, 32>(1);
+  // copy p0 into p1
+  poly_t& p1 = *alloc_aligned<poly_t, 32>(1, p0);
 
-  // deserialize the stream
-  iarchive(p1);
+  // free p0
+  free_aligned(1, &p0);
 
-  // Verify that p0 == p1
-  bool ret_value = (p0 == p1);
+  // define a new polynomial p2
+  poly_t& p2 = *alloc_aligned<poly_t, 32>(1);
+
+  // deserialize the stream into p2
+  iarchive(p2);
+
+  // Verify that p1 == p2
+  bool ret_value = (p1 == p2);
   
   // Cleaning
-  free_aligned(1, &p0);
   free_aligned(1, &p1);
+  free_aligned(1, &p2);
 
   return ret_value;
 }
@@ -49,19 +55,25 @@ bool run_p() {
   cereal::BinaryInputArchive iarchive(ss); // input archive
 
   // define a random polynomial
-  poly_p p0{nfl::uniform()};
+  poly_p* p0 = new poly_p(nfl::uniform());
 
   // serialize the polynomial
-  oarchive(p0);
+  oarchive(*p0);
 
-  // define a new polynomial
-  poly_p p1;
+  // copy p0 into p1
+  poly_p p1 = *p0;
 
-  // deserialize the stream
-  iarchive(p1);
+  // delete p0
+  delete p0;
 
-  // Verify that p0 == p1
-  return (p0 == p1);
+  // define a new polynomial p2
+  poly_p p2;
+
+  // deserialize the stream into p2
+  iarchive(p2);
+
+  // Verify that p1 == p2
+  return (p1 == p2);
 }
 
 int main(int argc, char const* argv[]) {
