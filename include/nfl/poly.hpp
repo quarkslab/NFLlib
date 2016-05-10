@@ -151,10 +151,13 @@ public:
   void ntt_pow_phi() { base.ntt_pow_phi(*this);}
   void invntt_pow_invphi() { base.invntt_pow_invphi(*this); }
 
-  /* serializer (cereal)
+  /* manual serializers
   */
-  template<class Archive> void serialize(Archive & archive) { 
-    archive( _data ); // serialize coefficients by passing them to the archive
+  inline void serialize(std::ostream& outputstream) {
+    outputstream.write(reinterpret_cast<char*>(_data), N * sizeof(T));
+  }
+  inline void deserialize(std::istream& inputstream) {
+    inputstream.read(reinterpret_cast<char*>(_data), N * sizeof(T));
   }
 
   protected:

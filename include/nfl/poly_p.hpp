@@ -141,10 +141,13 @@ public:
   void ntt_pow_phi() { poly_obj().ntt_pow_phi();}
   void invntt_pow_invphi() { poly_obj().invntt_pow_invphi(); }
 
-  /* serializer (cereal)
+  /* manual serializers
   */
-  template<class Archive> void serialize(Archive & archive) { 
-    archive( poly_obj() );
+  inline void serialize(std::ostream& outputstream) {
+    poly_obj().serialize(outputstream);
+  }
+  inline void deserialize(std::istream& inputstream) {
+    poly_obj().deserialize(inputstream);
   }
 
   /* set */

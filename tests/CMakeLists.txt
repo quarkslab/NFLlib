@@ -13,12 +13,6 @@ set(CONFIGS
     "8, 60, uint32_t"
 )
 
-find_package(CEREAL)
-if(CEREAL_FOUND)
-MESSAGE(STATUS "Found CEREAL: ${CEREAL_INCLUDE_DIR}")
-include_directories(${CEREAL_INCLUDE_DIR})
-endif()
-
 #always double check during tests
 add_definitions(-DCHECK_STRICTMOD)
 
@@ -35,7 +29,7 @@ foreach(CONFIG ${CONFIGS})
 
     endforeach()
 
-    foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p poly_set poly_mpz)
+    foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p poly_set poly_mpz poly_serialize)
 
         file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp"
             "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/${OP}.cpp\"\n")
@@ -44,16 +38,6 @@ foreach(CONFIG ${CONFIGS})
         add_test(run_${OP}${CONFIG_ID}_${VERSION} ${OP}${CONFIG_ID}_${VERSION})
         
     endforeach()
-
-    if(CEREAL_FOUND)
-
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/poly_serialize${CONFIG_ID}_${VERSION}.cpp"
-            "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/poly_serialize.cpp\"\n")
-        add_executable(poly_serialize${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/poly_serialize${CONFIG_ID}_${VERSION}.cpp)
-        target_link_libraries(poly_serialize${CONFIG_ID}_${VERSION} nfllib)
-        add_test(run_poly_serialize${CONFIG_ID}_${VERSION} poly_serialize${CONFIG_ID}_${VERSION})
-
-    endif()
 
 endforeach()
 
