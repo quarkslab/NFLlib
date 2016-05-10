@@ -23,7 +23,7 @@
 #define TEST_LWE_SYMMETRIC
 
 template <class P>
-__attribute__((noinline)) static void encrypt(P& resa, P& resb, P const & pka, P const & pkb, P const & pkaprime, P const & pkbprime, FastGaussianNoise<uint8_t, typename P::value_type, 2> *g_prng)
+__attribute__((noinline)) static void encrypt(P& resa, P& resb, P const & pka, P const & pkb, P const & pkaprime, P const & pkbprime, nfl::FastGaussianNoise<uint8_t, typename P::value_type, 2> *g_prng)
 {
   // u
   P tmpu = nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng);
@@ -163,7 +163,7 @@ int run()
 #endif
 
 #ifdef TEST_GAUSSIAN_GENERATION
-  FastGaussianNoise<uint8_t, T, 2> fg_prng(20, 128, 1<<14);
+  nfl::FastGaussianNoise<uint8_t, T, 2> fg_prng(20, 128, 1<<14);
   start = std::chrono::steady_clock::now();
   std::fill(resa, resa + REPETITIONS, nfl::gaussian<uint8_t, T, 2>(&fg_prng));
   std::fill(resb, resb + REPETITIONS, nfl::gaussian<uint8_t, T, 2>(&fg_prng));
@@ -294,17 +294,12 @@ int run()
 	  &pkb = *alloc_aligned<poly_t, 32>(1),
 	  &pkbprime = *alloc_aligned<poly_t, 32>(1);
   
+  // Gaussian sampler
+  nfl::FastGaussianNoise<uint8_t, T, 2> g_prng(SIGMA, 128, 1<<10);
+  
   // This step generates a secret key
-  FastGaussianNoise<uint8_t, T, 2> g_prng(SIGMA, 128, 1<<10);
-  // BUG CRASHES
-  //FastGaussianNoise<uint8_t, T, 2> g_prng(SIGMA, 80, 1<<8);
   poly_t &s = *alloc_aligned<poly_t, 32>(1, nfl::gaussian<uint8_t, T, 2>(&g_prng));
   poly_t &sprime = *alloc_aligned<poly_t, 32>(1);
-  //for(auto & v : s)
-  //{
-  //  std::cout <<  v << " ";
-  //}
-  std::cout << std::endl;
   s.ntt_pow_phi();
   sprime = nfl::compute_shoup(s);
 

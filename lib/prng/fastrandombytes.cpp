@@ -9,6 +9,8 @@
 #include <inttypes.h>
 #include <iostream>
 
+namespace nfl {
+
 static int init = 0;
 static unsigned char key[crypto_stream_salsa20_KEYBYTES];
 static unsigned char nonce[crypto_stream_salsa20_NONCEBYTES] = {0};
@@ -33,15 +35,4 @@ void fastrandombytes(unsigned char *r, unsigned long long rlen)
     nonce[i] = (n >> 8*i) & 0xff;
 }
 
-/*int main(int argc, char**argv) {
-    int randlen = 1024;
-    unsigned char t[randlen*sizeof(unsigned long long)];
-    double start = omp_get_wtime();
-    fastrandombytes((unsigned char *)t, randlen*sizeof(unsigned long long));
-    double end= omp_get_wtime();
-    std::cout << (end-start) << std::endl;
-    for(int i=0;i<1024*sizeof(unsigned long long);i++) std::cout<<std::hex<<(int)t[i]<<" ";
-    std::cout<<std::endl;
-    
-    
-}*/
+}

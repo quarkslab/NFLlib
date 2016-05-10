@@ -1,9 +1,6 @@
 #ifndef fast_gauss_noise_h
 #define fast_gauss_noise_h
 
-#define tstbit(x, n)  ((x << (63 - n)) >> 63 )
-
-
 #include <cstdint>
 #include <cstddef>
 #include <list>
@@ -22,6 +19,10 @@
 #ifdef BOOST_RAPHSON
 #include <boost/math/tools/roots.hpp>
 #endif
+
+namespace nfl {
+
+#define tstbit(x, n)  ((x << (63 - n)) >> 63 )
 
 //#define OUTPUT_BARRIERS
 //#define OUTPUT_LUT_FLAGS
@@ -645,6 +646,6 @@ FastGaussianNoise<in_class, out_class, _lu_depth>::~FastGaussianNoise()
   }
 }
 
-
+}  // namespace nfl
 
 #endif
