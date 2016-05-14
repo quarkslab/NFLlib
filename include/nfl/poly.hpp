@@ -151,6 +151,14 @@ public:
   void ntt_pow_phi() { base.ntt_pow_phi(*this);}
   void invntt_pow_invphi() { base.invntt_pow_invphi(*this); }
 
+  // Serialization API
+  //
+  // Serialization of polynomials is not portable in terms of "cross
+  // architecture portability".
+  // Therefore, serialization should not be used in the rare cases a big-endian
+  // machine will use NFLlib and communicate serialized data to a little-endian
+  // machine.
+  
   /* manual serializers
   */
   void serialize_manually(std::ostream& outputstream) {
