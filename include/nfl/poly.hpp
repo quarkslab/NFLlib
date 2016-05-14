@@ -153,11 +153,17 @@ public:
 
   /* manual serializers
   */
-  inline void serialize(std::ostream& outputstream) {
+  void serialize_manually(std::ostream& outputstream) {
     outputstream.write(reinterpret_cast<char*>(_data), N * sizeof(T));
   }
-  inline void deserialize(std::istream& inputstream) {
+  void deserialize_manually(std::istream& inputstream) {
     inputstream.read(reinterpret_cast<char*>(_data), N * sizeof(T));
+  }
+
+  /* serializer (cereal)
+  */
+  template<class Archive> void serialize(Archive & archive) { 
+    archive( _data ); // serialize coefficients by passing them to the archive
   }
 
   protected:

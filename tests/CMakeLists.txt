@@ -16,6 +16,13 @@ set(CONFIGS
 #always double check during tests
 add_definitions(-DCHECK_STRICTMOD)
 
+#if cereal exists
+find_package(CEREAL)
+if(CEREAL_FOUND)
+MESSAGE(STATUS "Found CEREAL: ${CEREAL_INCLUDE_DIR}")
+include_directories(${CEREAL_INCLUDE_DIR})
+endif()
+
 foreach(CONFIG ${CONFIGS})
     string(REGEX REPLACE ", " "_" CONFIG_ID ${CONFIG})
 
@@ -29,15 +36,25 @@ foreach(CONFIG ${CONFIGS})
 
     endforeach()
 
-    foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p poly_set poly_mpz poly_serialize)
+    foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p poly_set poly_mpz poly_serialize_manually)
 
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp"
+        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}.cpp"
             "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/${OP}.cpp\"\n")
-        add_executable(${OP}${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp)
-        target_link_libraries(${OP}${CONFIG_ID}_${VERSION} nfllib)
-        add_test(run_${OP}${CONFIG_ID}_${VERSION} ${OP}${CONFIG_ID}_${VERSION})
+        add_executable(${OP}${CONFIG_ID} ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}.cpp)
+        target_link_libraries(${OP}${CONFIG_ID} nfllib)
+        add_test(run_${OP}${CONFIG_ID} ${OP}${CONFIG_ID})
         
     endforeach()
+
+    if(CEREAL_FOUND)
+
+        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/poly_serialize_cereal${CONFIG_ID}.cpp"
+            "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/poly_serialize_cereal.cpp\"\n")
+        add_executable(poly_serialize_cereal${CONFIG_ID} ${CMAKE_CURRENT_BINARY_DIR}/poly_serialize_cereal${CONFIG_ID}.cpp)
+        target_link_libraries(poly_serialize_cereal${CONFIG_ID} nfllib)
+        add_test(run_poly_serialize_cereal${CONFIG_ID} poly_serialize_cereal${CONFIG_ID})
+
+    endif()
 
 endforeach()
 

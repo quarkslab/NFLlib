@@ -143,11 +143,17 @@ public:
 
   /* manual serializers
   */
-  inline void serialize(std::ostream& outputstream) {
-    poly_obj().serialize(outputstream);
+  void serialize_manually(std::ostream& outputstream) {
+    poly_obj().serialize_manually(outputstream);
   }
-  inline void deserialize(std::istream& inputstream) {
-    poly_obj().deserialize(inputstream);
+  void deserialize_manually(std::istream& inputstream) {
+    poly_obj().deserialize_manually(inputstream);
+  }
+
+  /* serializer (cereal)
+  */
+  template<class Archive> void serialize(Archive & archive) { 
+    archive( poly_obj() );
   }
 
   /* set */

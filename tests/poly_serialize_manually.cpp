@@ -15,7 +15,7 @@ bool run() {
   poly_t& p0 = *alloc_aligned<poly_t, 32>(1, nfl::uniform());
 
   // serialize the polynomial
-  p0.serialize(ss);
+  p0.serialize_manually(ss);
 
   // copy p0 into p1
   poly_t& p1 = *alloc_aligned<poly_t, 32>(1, p0);
@@ -27,7 +27,7 @@ bool run() {
   poly_t& p2 = *alloc_aligned<poly_t, 32>(1);
 
   // deserialize the stream into p2
-  p2.deserialize(ss);
+  p2.deserialize_manually(ss);
 
   // Verify that p1 == p2
   bool ret_value = (p1 == p2);
@@ -51,7 +51,7 @@ bool run_p() {
   poly_p* p0 = new poly_p(nfl::uniform());
 
   // serialize the polynomial
-  p0->serialize(ss);
+  p0->serialize_manually(ss);
 
   // copy p0 into p1
   poly_p p1 = *p0;
@@ -63,7 +63,7 @@ bool run_p() {
   poly_p p2;
 
   // deserialize the stream into p2
-  p2.deserialize(ss);
+  p2.deserialize_manually(ss);
 
   // Verify that p1 == p2
   return (p1 == p2);
