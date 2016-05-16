@@ -133,7 +133,7 @@ poly<T, Degree, NbModuli>::GMP::GMP() {
 
   // Compute the lifting coefficients
   mpz_t quotient, current_modulus;
-  mpz_inits(quotient, current_modulus);
+  mpz_inits(quotient, current_modulus, nullptr);
 
   for (size_t cm = 0; cm < nmoduli; cm++) {
     // Current modulus
