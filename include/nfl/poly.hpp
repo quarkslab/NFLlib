@@ -216,6 +216,8 @@ public:
     mpz_t   moduli_product;
     mpz_t   modulus_shoup;
     size_t bits_in_moduli_product;
+    size_t bits_in_modulus_shoup;
+    size_t shift_modulus_shoup;
     std::array<mpz_t, nmoduli> lifting_integers;
 
     /* Constructor & Destructor
