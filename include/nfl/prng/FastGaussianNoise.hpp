@@ -1,9 +1,6 @@
 #ifndef fast_gauss_noise_h
 #define fast_gauss_noise_h
 
-#define tstbit(x, n)  ((x << (63 - n)) >> 63 )
-
-
 #include <cstdint>
 #include <cstddef>
 #include <list>
@@ -23,10 +20,16 @@
 #include <boost/math/tools/roots.hpp>
 #endif
 
+
 //#define OUTPUT_BARRIERS
 //#define OUTPUT_LUT_FLAGS
 // Use it to test rare values do not happen too often
 //#define UNITTEST_ONEMILLION
+
+namespace nfl {
+
+template<typename T0, typename T1>
+constexpr inline auto tstbit(T0 x, T1 n) -> decltype((x << (63 - n)) >> 63 ) { return ((x << (63 - n)) >> 63 ); }
 
 template<class in_class, class out_class>
 struct output {
@@ -275,7 +278,7 @@ void FastGaussianNoise<in_class, out_class, _lu_depth>::init()
     std::cout << "FastGaussianNoise: WARNING outputs are above 2**31, unexpected results" << std::endl;
 
   // Finally we precompute 1/(2*sigma**2) to accelerate things
-	mpfr_inits2(_bit_precision, _const_sigma, NULL);
+	mpfr_inits2(_bit_precision, _const_sigma, nullptr);
   mpfr_set_d(_const_sigma, _sigma, MPFR_RNDN);
 	mpfr_sqr(_const_sigma, _const_sigma, MPFR_RNDN);
 	mpfr_mul_ui(_const_sigma, _const_sigma, 2, MPFR_RNDN); 
@@ -294,7 +297,7 @@ void FastGaussianNoise<in_class, out_class, _lu_depth>::precomputeBarrierValues(
   // Declare and init mpfr vars
   mpfr_t sum, tmp, tmp2;
   mpfr_t *mp_barriers;
-  mpfr_inits2(_bit_precision, sum, tmp, tmp2, NULL);
+  mpfr_inits2(_bit_precision, sum, tmp, tmp2, nullptr);
 
   // This var is used to export mpfr values
   mpz_t int_value;
@@ -345,7 +348,7 @@ void FastGaussianNoise<in_class, out_class, _lu_depth>::precomputeBarrierValues(
     mpfr_mul(mp_barriers[i], mp_barriers[i], sum, MPFR_RNDN);  
     mpfr_get_z(int_value, mp_barriers[i], MPFR_RNDN);
     mpz_export((void *) (barriers[i] + ((int)_word_precision - 
-           (int)ceil( (float)mpz_sizeinbase(int_value, 256)/sizeof(in_class) ))), NULL, 1, sizeof(in_class), 0, 0, int_value);
+           (int)ceil( (float)mpz_sizeinbase(int_value, 256)/sizeof(in_class) ))), nullptr, 1, sizeof(in_class), 0, 0, int_value);
 #ifdef OUTPUT_BARRIERS
     mpz_out_str(stdout, 10, int_value);
     std::cout << " = Barriers[" << i << "] = " << std::endl;
@@ -357,7 +360,7 @@ void FastGaussianNoise<in_class, out_class, _lu_depth>::precomputeBarrierValues(
 #endif 
     mpfr_clear(mp_barriers[i]);
   }
-	mpfr_clears(sum, tmp, tmp2, NULL);
+	mpfr_clears(sum, tmp, tmp2, nullptr);
   mpz_clear(int_value);
 	mpfr_free_cache();
   free(mp_barriers);
@@ -625,11 +628,11 @@ FastGaussianNoise<in_class, out_class, _lu_depth>::~FastGaussianNoise()
   // Freed allocated memory for the barriers
   for (unsigned ctr = 0; ctr < _number_of_barriers; ctr++)
   {
-    if (barriers[ctr] != NULL) free(barriers[ctr]); 
-    barriers[ctr] = NULL;
+    if (barriers[ctr] != nullptr) free(barriers[ctr]); 
+    barriers[ctr] = nullptr;
   }
-  if (barriers != NULL) free(barriers);
-  barriers=NULL;
+  if (barriers != nullptr) free(barriers);
+  barriers=nullptr;
 
   // Free other variables
   mpfr_clear(_const_sigma);
@@ -639,12 +642,12 @@ FastGaussianNoise<in_class, out_class, _lu_depth>::~FastGaussianNoise()
   {
     for (unsigned ctr = 0 ; ctr < _lu_size; ctr++)
     {
-      if (lu_table2[ctr]!=NULL) delete[](lu_table2[ctr]);
+      if (lu_table2[ctr]!=nullptr) delete[](lu_table2[ctr]);
     }
     free(lu_table2);
   }
 }
 
-
+}  // namespace nfl
 
 #endif

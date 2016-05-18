@@ -333,13 +333,13 @@
 
 # qhasm: stack64 bytes_backup
 
-# qhasm: enter crypto_stream_salsa20_amd64_xmm6
+# qhasm: enter nfl_crypto_stream_salsa20_amd64_xmm6
 .text
 .p2align 5
-.globl _crypto_stream_salsa20_amd64_xmm6
-.globl crypto_stream_salsa20_amd64_xmm6
-_crypto_stream_salsa20_amd64_xmm6:
-crypto_stream_salsa20_amd64_xmm6:
+.globl _nfl_crypto_stream_salsa20_amd64_xmm6
+.globl nfl_crypto_stream_salsa20_amd64_xmm6
+_nfl_crypto_stream_salsa20_amd64_xmm6:
+nfl_crypto_stream_salsa20_amd64_xmm6:
 mov %rsp,%r11
 and $31,%r11
 add $480,%r11
@@ -436,13 +436,13 @@ sub  %r9,%rdi
 # qhasm: goto start
 jmp ._start
 
-# qhasm: enter crypto_stream_salsa20_amd64_xmm6_xor
+# qhasm: enter nfl_crypto_stream_salsa20_amd64_xmm6_xor
 .text
 .p2align 5
-.globl _crypto_stream_salsa20_amd64_xmm6_xor
-.globl crypto_stream_salsa20_amd64_xmm6_xor
-_crypto_stream_salsa20_amd64_xmm6_xor:
-crypto_stream_salsa20_amd64_xmm6_xor:
+.globl _nfl_crypto_stream_salsa20_amd64_xmm6_xor
+.globl nfl_crypto_stream_salsa20_amd64_xmm6_xor
+_nfl_crypto_stream_salsa20_amd64_xmm6_xor:
+nfl_crypto_stream_salsa20_amd64_xmm6_xor:
 mov %rsp,%r11
 and $31,%r11
 add $480,%r11

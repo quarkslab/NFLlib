@@ -7,16 +7,16 @@ int main(int argc, const char *argv[])
 {
 	typedef int32_t T;
 	//FastGaussianNoise<uint16_t, T, 1> rng(300, 128, 1UL<<10, true);
-	FastGaussianNoise<uint8_t, T, 2> rng(3.19, 128, 1UL << 19, 5.25, true);
+	nfl::FastGaussianNoise<uint8_t, T, 2> rng(3.19, 128, 1UL << 19, 5.25, true);
 
 	T *noise = new T[OUTPUT_NOISE_SIZE]();
 	bzero(noise, OUTPUT_NOISE_SIZE);
 
 	for (unsigned i = 0; i < REPETITIONS ; i++)
 	{
-		uint64_t start = rdtsc();
+		uint64_t start = nfl::rdtsc();
 		rng.getNoise(noise, OUTPUT_NOISE_SIZE);
-		uint64_t stop = rdtsc();
+		uint64_t stop = nfl::rdtsc();
 
 	  printf("FastGaussianNoise: Gaussian noise cycles = %.2e bits = %.2e cycles/bit = %.2e\n", (float) stop - start, (float) (OUTPUT_NOISE_SIZE*CHAR_BIT), (float)(stop - start) / (OUTPUT_NOISE_SIZE*CHAR_BIT));
   } 
