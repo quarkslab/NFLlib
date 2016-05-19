@@ -23,25 +23,37 @@ foreach(CONFIG ${CONFIGS})
 
         file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/nfllib_demo${CONFIG_ID}_${VERSION}.cpp"
             "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/nfllib_demo_main_${VERSION}.cpp\"\n")
-        add_executable(nfllib_demo${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/nfllib_demo${CONFIG_ID}_${VERSION}.cpp)
+        add_executable(nfllib_demo${CONFIG_ID}_${VERSION}
+                       EXCLUDE_FROM_ALL
+                       ${CMAKE_CURRENT_BINARY_DIR}/nfllib_demo${CONFIG_ID}_${VERSION}.cpp)
         target_link_libraries(nfllib_demo${CONFIG_ID}_${VERSION} nfllib)
+        add_test(build_nfllib_demo${CONFIG_ID}_${VERSION} "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target  nfllib_demo${CONFIG_ID}_${VERSION})
         add_test(run_nfllib_demo${CONFIG_ID}_${VERSION} nfllib_demo${CONFIG_ID}_${VERSION})
+        set_tests_properties(run_nfllib_demo${CONFIG_ID}_${VERSION} PROPERTIES DEPENDS nfllib_demo${CONFIG_ID}_${VERSION})
 
     endforeach()
 
     foreach(OP nfl_add nfl_sub nfl_mul nfl_eq nfl_neq nfl_stream poly_p poly_set poly_mpz)
         file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp"
             "#define CONFIG ${CONFIG}\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/${OP}.cpp\"\n")
-        add_executable(${OP}${CONFIG_ID}_${VERSION} ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp)
+        add_executable(${OP}${CONFIG_ID}_${VERSION}
+                       EXCLUDE_FROM_ALL
+                       ${CMAKE_CURRENT_BINARY_DIR}/${OP}${CONFIG_ID}_${VERSION}.cpp)
         target_link_libraries(${OP}${CONFIG_ID}_${VERSION} nfllib)
+        add_test(build_${OP}${CONFIG_ID}_${VERSION} "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target ${OP}${CONFIG_ID}_${VERSION})
         add_test(run_${OP}${CONFIG_ID}_${VERSION} ${OP}${CONFIG_ID}_${VERSION})
+        set_tests_properties(run_${OP}${CONFIG_ID}_${VERSION} PROPERTIES DEPENDS build_${OP}${CONFIG_ID}_${VERSION})
     endforeach()
 
 endforeach()
 
-add_executable(prng_demo prng_demo_main.cpp)
+add_executable(prng_demo
+               EXCLUDE_FROM_ALL
+               prng_demo_main.cpp)
 target_link_libraries(prng_demo nfllib)
+add_test(build_prng_demo "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target prng_demo)
 add_test(run_prng_demo prng_demo)
+set_tests_properties(run_prng_demo PROPERTIES DEPENDS build_prng_demo)
 
-add_executable(ntt_perfs ntt_perfs.cpp)
+add_executable(ntt_perfs EXCLUDE_FROM_ALL ntt_perfs.cpp)
 target_link_libraries(ntt_perfs nfllib)
