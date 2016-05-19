@@ -6,6 +6,8 @@
  * http://jmabille.github.io/blog/2014/12/06/aligned-memory-allocator/
  */
 
+namespace nfl {
+
 namespace detail {
 inline void* _aligned_malloc(size_t size, size_t alignment) {
   void* res = 0;
@@ -114,4 +116,6 @@ typename aligned_allocator<T, N>::pointer aligned_allocator<T, N>::allocate(
 template <class T, int N>
 inline void aligned_allocator<T, N>::deallocate(pointer p, size_type) {
   aligned_free(p);
+}
+
 }
