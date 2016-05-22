@@ -141,6 +141,21 @@ public:
   void ntt_pow_phi() { poly_obj().ntt_pow_phi();}
   void invntt_pow_invphi() { poly_obj().invntt_pow_invphi(); }
 
+  /* manual serializers
+  */
+  void serialize_manually(std::ostream& outputstream) {
+    poly_obj().serialize_manually(outputstream);
+  }
+  void deserialize_manually(std::istream& inputstream) {
+    poly_obj().deserialize_manually(inputstream);
+  }
+
+  /* serializer (cereal)
+  */
+  template<class Archive> void serialize(Archive & archive) { 
+    archive( poly_obj() );
+  }
+
   /* set */
   void set(value_type v, bool reduce_coeffs = true) { poly_obj().set(v, reduce_coeffs); };
   void set(uniform const& mode) { poly_obj().set(mode); };

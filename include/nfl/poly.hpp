@@ -151,6 +151,29 @@ public:
   void ntt_pow_phi() { base.ntt_pow_phi(*this);}
   void invntt_pow_invphi() { base.invntt_pow_invphi(*this); }
 
+  // Serialization API
+  //
+  // Serialization of polynomials is not portable in terms of "cross
+  // architecture portability".
+  // Therefore, serialization should not be used in the rare cases a big-endian
+  // machine will use NFLlib and communicate serialized data to a little-endian
+  // machine.
+  
+  /* manual serializers
+  */
+  void serialize_manually(std::ostream& outputstream) {
+    outputstream.write(reinterpret_cast<char*>(_data), N * sizeof(T));
+  }
+  void deserialize_manually(std::istream& inputstream) {
+    inputstream.read(reinterpret_cast<char*>(_data), N * sizeof(T));
+  }
+
+  /* serializer (cereal)
+  */
+  template<class Archive> void serialize(Archive & archive) { 
+    archive( _data ); // serialize coefficients by passing them to the archive
+  }
+
   protected:
   // NTT-based Fast Lattice library main class
   // - degree is the degree of the quotient polynomial in the ring, it must
