@@ -6,6 +6,7 @@
 #include "nfl/poly.hpp"
 #include "nfl/ops.hpp"
 #include "nfl/algos.hpp"
+#include "nfl/permut.hpp"
 #include <type_traits>
 
 namespace nfl {
@@ -463,31 +464,6 @@ template<class T, size_t Degree, size_t NbModuli> bool poly<T, Degree, NbModuli>
   return true;
 }
 
-// meta-compilation of the bit-reversing permutation
-template<size_t H, size_t degree, size_t R, size_t I>
-struct r_loop {
-  static constexpr size_t value = r_loop<(H << 1), degree, (R << 1) | (I & 1), (I >> 1)>::value;
-};
-template<size_t degree, size_t R, size_t I>
-struct r_loop<degree, degree, R, I> {
-  static constexpr size_t value = R;
-};
-template <size_t I, size_t J, size_t degree>
-struct r_set {
-  template<class value_type>
-  void operator()(value_type *y, value_type const *x) {
-    r_set<2*I,2*J, degree>{}(y, x);
-    r_set<2*I + 1,2*J, degree>{}(y, x);
-  }
-};
-template <size_t I, size_t degree>
-struct r_set<I, degree, degree> {
-  template<class value_type>
-  void operator()(value_type *y, value_type const *x) {
-    constexpr size_t r = r_loop<1, degree, 0u, I>::value;
-    y[r] = x[I];
-  }
-};
 
 // Inverse NTT: replaces NTT values representation by the classic
 // coefficient representation, parameters are the same as for ntt() with
@@ -502,12 +478,14 @@ template<class T, size_t Degree, size_t NbModuli> inline bool poly<T, Degree, Nb
     return true;
 
   // bit-reverse
-  r_set<0, 1, degree>{}(y, x);
+  //r_set<0, 1, degree>{}(y, x);
+  permut<degree>::compute(y, x);
 
   ntt(y, inv_wtab, inv_winvtab, p);
 
   // bit-reverse again
-  r_set<0, 1, degree>{}(x, y);
+  permut<degree>::compute(x, y);
+  //r_set<0, 1, degree>{}(x, y);
   return true;
 }
 
