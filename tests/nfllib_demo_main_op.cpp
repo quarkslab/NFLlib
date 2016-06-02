@@ -3,8 +3,8 @@
 #include <iostream>
 
 #define REPETITIONS 10
-#define NOISE_UB 8
-#define SIGMA 8
+#define NOISE_UB 4
+#define SIGMA 4
 #define LOOP 1
 
 #define TEST_SETCOEFFS

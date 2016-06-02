@@ -3,6 +3,7 @@ set(CONFIGS
     "128, 14, uint16_t"
     "1024, 60, uint32_t"
     "8192, 124, uint64_t"
+    "1048576, 124, uint64_t"
 )
 
 #always double check during tests

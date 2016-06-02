@@ -2,8 +2,8 @@
 #include <chrono>
 #include <iostream>
 
-#define REPETITIONS 1000
-#define NOISE_UB 8
+#define REPETITIONS 10
+#define NOISE_UB 4
 #define NOISE_SK 2
 #define LOOP 10
 
