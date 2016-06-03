@@ -1,6 +1,7 @@
 #include "nfllib_demo_main.hpp"
 #include <chrono>
 #include <iostream>
+#include "tools.h"
 
 #define REPETITIONS 10
 #define NOISE_UB 4
@@ -26,15 +27,15 @@ template <class P>
 __attribute__((noinline)) static void encrypt(P& resa, P& resb, P const & pka, P const & pkb, P const & pkaprime, P const & pkbprime, nfl::FastGaussianNoise<uint8_t, typename P::value_type, 2> *g_prng)
 {
   // u
-  P tmpu = nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng);
+  P &tmpu = *alloc_aligned<P, 32>(1, nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng));
   tmpu.ntt_pow_phi();
   
   // 2*e_1
-  P tmpe1 = nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng, 2);
+  P &tmpe1 = *alloc_aligned<P, 32>(1, nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng, 2));
   tmpe1.ntt_pow_phi();
 
   // 2*e_2
-  P tmpe2 = nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng, 2);
+  P &tmpe2 = *alloc_aligned<P, 32>(1, nfl::gaussian<uint8_t, typename P::value_type, 2>(g_prng, 2));
   tmpe2.ntt_pow_phi();
 
   // resa = pka * u + 2*e_2
@@ -61,19 +62,6 @@ double get_time_us(T const& start, T const& end, uint32_t N)
 {
   auto diff = end-start;
   return (long double)(std::chrono::duration_cast<std::chrono::microseconds>(diff).count())/N;
-}
-
-template <class T, size_t Align, class... Args>
-T* alloc_aligned(size_t n, Args&& ... args)
-{
-  T* ret;
-  if (posix_memalign((void**) &ret, Align, sizeof(T)*n) != 0) {
-    throw std::bad_alloc();
-  }
-  for (size_t i = 0; i < n; i++) {
-	  new (&ret[i]) T{std::forward<Args>(args)...};
-  }
-  return ret;
 }
 
 template <class P>
@@ -119,12 +107,6 @@ int run()
 
   // Polynomial arrays to do the tests 
   start = std::chrono::steady_clock::now();
-/* AG: on my system, this gives pointers non aligned on 32-bytes!
-  poly_t *resa = new poly_t[REPETITIONS],
-         *resb = new poly_t[REPETITIONS],
-         *resc = new poly_t[REPETITIONS],
-         *resd = new poly_t[REPETITIONS];
-*/
   poly_t *resa = alloc_aligned<poly_t, 32>(REPETITIONS),
          *resb = alloc_aligned<poly_t, 32>(REPETITIONS),
          *resc = alloc_aligned<poly_t, 32>(REPETITIONS),
@@ -357,10 +339,10 @@ int run()
 #endif
 
   // Cleaning
-  delete [] resa;
-  delete [] resb;
-  delete [] resc;
-  delete [] resd;
+  free_aligned(REPETITIONS, resa);
+  free_aligned(REPETITIONS, resb);
+  free_aligned(REPETITIONS, resc);
+  free_aligned(REPETITIONS, resd);
 
   return 0;
 }
