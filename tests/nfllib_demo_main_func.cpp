@@ -23,13 +23,6 @@
 #define TEST_FMAS_SHOUP
 #define TEST_LWE_SYMMETRIC
 
-template <class T>
-double get_time_us(T const& start, T const& end, uint32_t N)
-{
-  auto diff = end-start;
-  return (long double)(std::chrono::duration_cast<std::chrono::microseconds>(diff).count())/N;
-}
-
 template<size_t degree, size_t modulus, class T>
 int run()
 {
