@@ -1,6 +1,7 @@
 #include "nfllib_demo_main.hpp"
 #include <chrono>
 #include <iostream>
+#include "tools.h"
 
 #define REPETITIONS 50000
 
@@ -113,23 +114,6 @@ __attribute__((noinline)) void ntt_new(uint64_t* x, uint64_t* wtab, uint64_t* wi
     x[3] = z3;
   }
 
-}
-
-  template <class T>
-double get_time_us(T const& start, T const& end, uint32_t N)
-{
-  auto diff = end-start;
-  return (long double)(std::chrono::duration_cast<std::chrono::microseconds>(diff).count())/N;
-}
-
-  template <class T, size_t Align>
-T* alloc_aligned(size_t n)
-{
-  T* ret;
-  if (posix_memalign((void**) &ret, Align, sizeof(T)*n) != 0) {
-    throw std::bad_alloc();
-  }
-  return ret;
 }
 
 namespace nfl { namespace tests {

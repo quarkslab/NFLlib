@@ -1,6 +1,7 @@
 #include "nfllib_demo_main.hpp"
 #include <chrono>
 #include <iostream>
+#include "tools.h"
 
 #define REPETITIONS 10
 #define NOISE_UB 4
@@ -21,24 +22,6 @@
 #define TEST_FMAS
 #define TEST_FMAS_SHOUP
 #define TEST_LWE_SYMMETRIC
-
-template <class T>
-double get_time_us(T const& start, T const& end, uint32_t N)
-{
-  auto diff = end-start;
-  return (long double)(std::chrono::duration_cast<std::chrono::microseconds>(diff).count())/N;
-}
-
-template <class T, size_t Align>
-T* alloc_aligned(size_t n)
-{
-  T* ret;
-  if (posix_memalign((void**) &ret, Align, sizeof(T)*n) != 0) {
-    throw std::bad_alloc();
-  }
-  return ret;
-}
-
 
 template<size_t degree, size_t modulus, class T>
 int run()
@@ -126,10 +109,10 @@ int run()
 #endif
 
   // Cleaning
-  delete [] resa;
-  delete [] resb;
-  delete [] resc;
-  delete [] resd;
+  free_aligned(REPETITIONS, resa);
+  free_aligned(REPETITIONS, resb);
+  free_aligned(REPETITIONS, resc);
+  free_aligned(REPETITIONS, resd);
 
   return 0;
 }

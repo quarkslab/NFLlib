@@ -23,4 +23,11 @@ void free_aligned(size_t n, T* p)
 	free(p);
 }
 
+template <class T>
+double get_time_us(T const& start, T const& end, uint32_t N)
+{
+  auto diff = end-start;
+  return (long double)(std::chrono::duration_cast<std::chrono::microseconds>(diff).count())/N;
+}
+
 #endif
