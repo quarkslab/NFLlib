@@ -1,6 +1,8 @@
 #ifndef NFL_TESTS_TOOLS_H
 #define NFL_TESTS_TOOLS_H
 
+#include <chrono>
+
 template <class T, size_t Align, class... Args>
 T* alloc_aligned(size_t n, Args&& ... args)
 {
