@@ -50,4 +50,4 @@ If you have issues building the documentation please contact the developper team
 
 # Contributors
 
-This library is an extension/evolution of the NTTTools module from [XPIR](https://github.com/XPIR-team/XPIR) done by members of [Cryptoexperts](https://www.cryptoexperts.com), [INP ENSEEIHT](http://www.enseeiht.com), [Quarkslab](http://www.quarkslab.com) (in alphabetical order).
+This library is an extension/evolution of the NTTTools module from [XPIR](https://github.com/XPIR-team/XPIR) done by members of [CryptoExperts](https://www.cryptoexperts.com), [INP ENSEEIHT](http://www.enseeiht.com), [Quarkslab](http://www.quarkslab.com) (in alphabetical order).
