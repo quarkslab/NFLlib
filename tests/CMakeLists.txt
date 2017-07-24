@@ -73,3 +73,5 @@ set_tests_properties(run_prng_demo PROPERTIES DEPENDS build_prng_demo)
 
 add_executable(ntt_perfs EXCLUDE_FROM_ALL ntt_perfs.cpp)
 target_link_libraries(ntt_perfs nfllib)
+
+add_executable(ntt_multi multi0.cpp multi1.cpp)
