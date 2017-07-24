@@ -133,6 +133,7 @@ struct funct
 	double k;
 };
 
+inline
 double newton_raphson(double k, double max_guess, int digits)
 {
   unsigned max_counter = 1U<<15;
