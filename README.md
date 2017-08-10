@@ -26,11 +26,17 @@ $> make install
 
 The following CMake options are relevant:
 
-Option                             | Description
------------------------------------|---------------------------------
-`-DCMAKE_INSTALL_PREFIX=<value>`   | Where the library is installed
-`-DCMAKE_BUILD_TYPE=Release|Debug` | The basic compiler configuration
-`-DNFL_OPTIMIZED=ON`               | Enable SSE/AVX-based optimization
+Option                              | Description
+------------------------------------|---------------------------------
+`-DCMAKE_INSTALL_PREFIX=<value>`    | Where the library is installed
+`-DCMAKE_BUILD_TYPE=Release\|Debug` | The basic compiler configuration
+`-DNFL_OPTIMIZED=ON`                | Enable SSE/AVX-based optimization
+
+# SSE/AVX optimizations
+
+To use SSE-based optimizations, compile the code with the flags `-DNFL_OPTIMIZED=ON -DNTT_SSE`.
+
+To use AVX-based optimizations, compile the code with the flags `-DNFL_OPTIMIZED=ON -DNTT_AVX2`.
 
 # Getting started
 

@@ -337,7 +337,7 @@ struct mulmod_shoup<uint16_t, simd::avx2>
   // This works fine with GCC 4.9 and clang 3.5! 
   __attribute__((noinline))
 #endif
-  __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, size_t value_type p) const
+  __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, value_type p) const
   {
     assert_strict_mod_sse<value_type>(sse_x, p);
     assert_strict_mod_sse<value_type>(sse_y, p);
