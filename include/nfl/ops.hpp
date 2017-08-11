@@ -84,7 +84,7 @@ struct expr {
       constexpr size_t vector_bound = degree / vector_size * vector_size;
       static_assert(vector_bound == degree, "no need for a footer");
       for(size_t j = 0; j < vector_bound; j+= vector_size) {
-        value_type tmp[vector_size];
+        alignas(32) value_type tmp[vector_size];
         simd_mode::store(tmp, load<simd_mode>(cm, j));
         for(size_t k = 0; k < vector_size; ++k)
           if(tmp[k])
