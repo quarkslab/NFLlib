@@ -76,7 +76,8 @@ template<>
 struct addmod<uint32_t, simd::sse>
 {
   using simd_mode = simd::sse;
-  __m128i operator()(__m128i const x, __m128i const y, uint32_t const p) const {
+  __m128i operator()(__m128i const x, __m128i const y, size_t const cm) const {
+    auto const p = params<uint32_t>::P[cm];
     assert_addmod_input_sse<uint32_t>(x, y, p);
 
     __m128i sse_p = _mm_set1_epi32(p);
@@ -95,7 +96,8 @@ template<>
 struct addmod<uint16_t, simd::sse>
 {
   using simd_mode = simd::sse;
-  __m128i operator()(__m128i x, __m128i y, uint16_t const p) const {
+  __m128i operator()(__m128i x, __m128i y, size_t const cm) const {
+    auto const p = params<uint16_t>::P[cm];
     assert_addmod_input_sse<uint16_t>(x, y, p);
 
     __m128i sse_p = _mm_set1_epi16(p);
@@ -120,12 +122,13 @@ template<>
 struct submod<uint16_t, simd::sse>
 {
   using simd_mode = simd::sse;
-  __m128i operator()(__m128i const x, __m128i const y, uint16_t const p) const {
+  __m128i operator()(__m128i const x, __m128i const y, size_t const cm) const {
+    auto const p = params<uint16_t>::P[cm];
     assert_strict_mod_sse<uint16_t>(x, p);
     assert_strict_mod_sse<uint16_t>(y, p);
 
     auto const sse_p = _mm_set1_epi16(p);
-    auto const sse_res = addmod<uint16_t, simd::sse>{}(x, _mm_sub_epi16(sse_p, y), p);
+    auto const sse_res = addmod<uint16_t, simd::sse>{}(x, _mm_sub_epi16(sse_p, y), cm);
 
     assert_strict_mod_sse<uint16_t>(sse_res, p);
     return sse_res;
@@ -136,12 +139,13 @@ template<>
 struct submod<uint32_t, simd::sse>
 {
   using simd_mode = simd::sse;
-  __m128i operator()(__m128i const x, __m128i const y, uint32_t const p) const {
+  __m128i operator()(__m128i const x, __m128i const y, size_t const cm) const {
+    auto const p = params<uint32_t>::P[cm];
     assert_strict_mod_sse<uint32_t>(x, p);
     assert_strict_mod_sse<uint32_t>(y, p);
 
     auto const sse_p = _mm_set1_epi32(p);
-    auto const sse_res = addmod<uint32_t, simd::sse>{}(x, _mm_sub_epi32(sse_p, y), p);
+    auto const sse_res = addmod<uint32_t, simd::sse>{}(x, _mm_sub_epi32(sse_p, y), cm);
 
     assert_strict_mod_sse<uint32_t>(sse_res, p);
     return sse_res;
@@ -330,8 +334,9 @@ struct mulmod_shoup<uint32_t, simd::sse>
     return _mm_shuffle_epi32(v, 1 | (0 << 2) | (3 << 4) | (2 << 6));
   }
 
-  inline __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, value_type const p) const
+  inline __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, size_t const cm) const
   {
+    auto const p = params<value_type>::P[cm];
     assert_strict_mod_sse<uint32_t>(sse_x, p);
     assert_strict_mod_sse<uint32_t>(sse_y, p);
 
@@ -389,8 +394,9 @@ struct mulmod_shoup<uint16_t, simd::sse>
     return _mm_srli_si128(v, 8);
   }
 
-  inline __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, value_type const p) const
+  inline __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, size_t const cm) const
   {
+    auto const p = params<value_type>::P[cm];
     assert_strict_mod_sse<uint16_t>(sse_x, p);
     assert_strict_mod_sse<uint16_t>(sse_y, p);
 
@@ -456,8 +462,9 @@ struct muladd_shoup<uint16_t, simd::sse>
     return _mm_srli_si128(v, 8);
   }
 
-  inline __m128i operator()(__m128i const sse_rop, __m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, value_type const p) const
+  inline __m128i operator()(__m128i const sse_rop, __m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, size_t const cm) const
   {
+    auto const p = params<uint16_t>::P[cm];
     assert_strict_mod_sse<uint16_t>(sse_x, p);
     assert_strict_mod_sse<uint16_t>(sse_y, p);
     assert_strict_mod_sse<uint16_t>(sse_rop, p);
