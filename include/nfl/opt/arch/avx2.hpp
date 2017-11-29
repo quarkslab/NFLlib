@@ -70,7 +70,8 @@ template<>
 struct addmod<uint32_t, simd::avx2>
 {
   using simd_mode = simd::avx2;
-  __m256i operator()(__m256i x, __m256i y, uint32_t const p) const {
+  __m256i operator()(__m256i x, __m256i y, size_t const cm) const {
+    auto const p = params<uint32_t>::P[cm];
     assert_addmod_input_avx2<uint32_t>(x, y, p);
 
     __m256i avx_p = _mm256_set1_epi32(p);
@@ -89,7 +90,8 @@ template<>
 struct addmod<uint16_t, simd::avx2>
 {
   using simd_mode = simd::avx2;
-  __m256i operator()(__m256i x, __m256i y, uint16_t const p) const {
+  __m256i operator()(__m256i x, __m256i y, size_t const cm) const {
+    auto const p = params<uint16_t>::P[cm];
     assert_addmod_input_avx2<uint16_t>(x, y, p);
 
     __m256i avx_p = _mm256_set1_epi16(p);
@@ -114,12 +116,13 @@ template<>
 struct submod<uint16_t, simd::avx2>
 {
   using simd_mode = simd::avx2;
-  __m256i operator()(__m256i const x, __m256i const y, uint16_t const p) const {
+  __m256i operator()(__m256i const x, __m256i const y, size_t const cm) const {
+    auto const p = params<uint16_t>::P[cm];
     assert_strict_mod_avx2<uint16_t>(x, p);
     assert_strict_mod_avx2<uint16_t>(y, p);
 
     auto const avx_p = _mm256_set1_epi16(p);
-    auto const avx_res = addmod<uint16_t, simd::avx2>{}(x, _mm256_sub_epi16(avx_p, y), p);
+    auto const avx_res = addmod<uint16_t, simd::avx2>{}(x, _mm256_sub_epi16(avx_p, y), cm);
 
     assert_strict_mod_avx2<uint16_t>(avx_res, p);
     return avx_res;
@@ -130,12 +133,13 @@ template<>
 struct submod<uint32_t, simd::avx2>
 {
   using simd_mode = simd::avx2;
-  __m256i operator()(__m256i const x, __m256i const y, size_t const p) const {
+  __m256i operator()(__m256i const x, __m256i const y, size_t const cm) const {
+    auto const p = params<uint32_t>::P[cm];
     assert_strict_mod_avx2<uint32_t>(x, p);
     assert_strict_mod_avx2<uint32_t>(y, p);
 
     auto const avx_p = _mm256_set1_epi32(p);
-    auto const avx_res = addmod<uint32_t, simd::avx2>{}(x, _mm256_sub_epi32(avx_p, y), p);
+    auto const avx_res = addmod<uint32_t, simd::avx2>{}(x, _mm256_sub_epi32(avx_p, y), cm);
 
     assert_strict_mod_avx2<uint32_t>(avx_res, p);
     return avx_res;
@@ -337,8 +341,9 @@ struct mulmod_shoup<uint16_t, simd::avx2>
   // This works fine with GCC 4.9 and clang 3.5! 
   __attribute__((noinline))
 #endif
-  __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, size_t value_type p) const
+  __m128i operator()(__m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, size_t const cm) const
   {
+    auto const p = params<value_type>::P[cm];
     assert_strict_mod_sse<value_type>(sse_x, p);
     assert_strict_mod_sse<value_type>(sse_y, p);
 
@@ -395,8 +400,9 @@ struct muladd_shoup<uint16_t, simd::avx2>
     return ret;
   }
 
-  inline __m128i operator()(__m128i const rop, __m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, value_type const p) const
+  inline __m128i operator()(__m128i const rop, __m128i const sse_x, __m128i const sse_y, __m128i const sse_yprime, size_t const cm) const
   {
+    auto const p = params<value_type>::P[cm];
     assert_strict_mod_sse<value_type>(sse_x, p);
     assert_strict_mod_sse<value_type>(sse_y, p);
     assert_strict_mod_sse<value_type>(rop, p);
