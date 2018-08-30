@@ -326,6 +326,30 @@ void poly<T, Degree, NbModuli>::set(gaussian<in_class, T, _lu_depth> const& mode
 }
 
 template<class T, size_t Degree, size_t NbModuli>
+poly<T, Degree, NbModuli>::poly(ZO_dist const& mode) {
+  set(mode);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set(ZO_dist const& mode) {
+  assert(mode.rho >= 0. && mode.rho <= 1.0);
+  uint8_t rnd[Degree];
+  value_type *ptr = &_data[0];
+  fastrandombytes(rnd, sizeof(rnd));
+  for (uint8_t r : rnd)
+  {
+    double odd = r * 1. / 0xFF;
+    *ptr++ = odd > mode.rho ? (r & 2) - 1U : 0U;
+  }
+  const value_type *end = &_data[N];
+  while (ptr != end)
+  {
+    std::memcpy(ptr, ptr + degree, degree * sizeof(value_type));
+    ptr += degree;
+  }
+}
+
+template<class T, size_t Degree, size_t NbModuli>
 poly<T, Degree, NbModuli>::poly(hwt_dist const& mode) {
   set(mode);
 }
