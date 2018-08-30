@@ -2,6 +2,9 @@
 #define NFL_CORE_HPP
 
 #include <type_traits>
+#include <vector>
+#include <numeric>
+#include <algorithm>
 
 #include "nfl/poly.hpp"
 #include "nfl/ops.hpp"
@@ -322,6 +325,44 @@ void poly<T, Degree, NbModuli>::set(gaussian<in_class, T, _lu_depth> const& mode
 #endif
 }
 
+template<class T, size_t Degree, size_t NbModuli>
+poly<T, Degree, NbModuli>::poly(hwt_dist const& mode) {
+  set(mode);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set(hwt_dist const& mode) {
+  assert(mode.hwt <= Degree);
+  std::vector<size_t> hitted(mode.hwt);
+  std::iota(hitted.begin(), hitted.end(), 0U); // select the first hwt positions.
+
+  size_t rnd[128];
+  size_t *rnd_end = rnd + 128;
+  size_t *rnd_ptr = rnd_end;
+  for (size_t k = mode.hwt; k < degree; ++k) 
+  {
+    if (rnd_ptr == rnd_end)
+    {
+      fastrandombytes((unsigned char *)rnd, sizeof(rnd));
+      rnd_ptr = &rnd[0];
+    }
+    size_t pos = (*rnd_ptr++) % k;
+    if (pos < mode.hwt)
+      hitted[pos] = k;
+  }
+
+  std::sort(hitted.begin(), hitted.end()); // for better locality ?
+  std::memset(_data, 0x0, N * sizeof(value_type)); // clear up all
+  size_t offset = 0;
+  while (offset < N) 
+  {
+    for (size_t pos : hitted)
+      _data[pos + offset] = 1U;
+    offset += degree;
+  }
+  std::memset(hitted.data(), 0x0, hitted.size() * sizeof(size_t)); // erase from memory
+  std::memset(rnd, 0x0, sizeof(rnd)); // erase from memory
+}
 
 // *********************************************************
 // Helper functions

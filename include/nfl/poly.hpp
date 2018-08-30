@@ -48,6 +48,11 @@ struct non_uniform {
   non_uniform(uint64_t ub, uint64_t amp) : upper_bound{ub}, amplifier{amp} {}
 };
 
+struct hwt_dist { // hamming weight distribution.
+  uint32_t hwt;
+  hwt_dist(uint32_t hwt_) : hwt(hwt_) {}
+};
+
 template<class in_class, class out_class, unsigned _lu_depth>
 struct gaussian {
   FastGaussianNoise<in_class, out_class, _lu_depth> *fg_prng;
@@ -99,6 +104,7 @@ public:
   poly();
   poly(uniform const& mode);
   poly(non_uniform const& mode);
+  poly(hwt_dist const& mode);
   poly(value_type v, bool reduce_coeffs = true);
   poly(std::initializer_list<value_type> values, bool reduce_coeffs = true);
   template <class It> poly(It first, It last, bool reduce_coeffs = true);
@@ -107,6 +113,7 @@ public:
 
   void set(uniform const& mode);
   void set(non_uniform const& mode);
+  void set(hwt_dist const& mode);
   void set(value_type v, bool reduce_coeffs = true);
   void set(std::initializer_list<value_type> values, bool reduce_coeffs = true);
   template <class It> void set(It first, It last, bool reduce_coeffs = true);
@@ -117,6 +124,7 @@ public:
   poly& operator=(value_type v) { set(v); return *this; }
   poly& operator=(uniform const& mode) { set(mode); return *this; }
   poly& operator=(non_uniform const& mode) { set(mode); return *this; }
+  poly& operator=(hwt_dist const& mode) { set(mode); return *this; }
   poly& operator=(std::initializer_list<value_type> values) { set(values); return *this; }
   template <class in_class, unsigned _lu_depth> poly& operator=(gaussian<in_class, T, _lu_depth> const& mode) { set(mode); return *this; }
   template <class Op, class... Args> poly& operator=(ops::expr<Op, Args...> const& expr);
