@@ -9,7 +9,7 @@ bool test_op()
   using greater_value_type = typename P::greater_value_type;
 
   return test_binary_op<P>(
-      [](T a, T b, T m) { return (a-b) % m; },
+      [](T a, T b, T m) { return (a >= b) ? (a-b) : (a-b+m); },
       [](P const& a, P const& b) { return a-b; }
   );
 }
