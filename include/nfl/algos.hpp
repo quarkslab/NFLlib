@@ -29,13 +29,13 @@ struct ntt_loop_body<simd::serial, poly, T>
     value_type u0 = *x0;
     value_type u1 = *x1;
 
+    value_type t0 = u0 + u1;
+    t0 -= ((t0 >= 2*_p) ? (2*_p) : 0);
+
     value_type t1 = u0 - u1 + 2*_p;
 
     value_type q = ((greater_value_type) t1 * (*winvtab)) >> params<T>::kModulusRepresentationBitsize;
     value_type t2 = t1 * (*wtab) - q * _p;
-
-    value_type t0 = u0 + u1;
-    t0 -= ((t0 >= 2*_p) ? (2*_p) : 0);
 
     *x0 = t0;
     *x1 = t2;
