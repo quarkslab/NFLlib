@@ -337,7 +337,7 @@ void poly<T, Degree, NbModuli>::set(ZO_dist const& mode) {
   fastrandombytes(rnd, sizeof(rnd));
   for (uint8_t r : rnd)
   {
-    *ptr++ = r >= mode.rho ? (r & 2) - 1U : 0U;
+    *ptr++ = r <= mode.rho ? (r & 2) - 1U : 0U;
   }
   const value_type *end = &_data[N];
   while (ptr != end)
