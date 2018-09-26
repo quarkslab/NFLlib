@@ -54,8 +54,8 @@ struct hwt_dist { // hamming weight distribution.
 };
 
 struct ZO_dist { // zero distribution.
-  double rho; // P(1) = rho/2, P(-1) = rho/2, P(0) = rho
-  ZO_dist(double rho_ = 0.5) : rho(rho_) {}
+  uint8_t rho; // P(1) = P(-1) = (rho/0xFF)/2, P(0) = 1 - P(1) - P(-1)
+  ZO_dist(uint8_t rho_ = 0x7F) : rho(rho_) {}
 };
 
 template<class in_class, class out_class, unsigned _lu_depth>

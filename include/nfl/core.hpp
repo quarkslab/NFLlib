@@ -332,14 +332,12 @@ poly<T, Degree, NbModuli>::poly(ZO_dist const& mode) {
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(ZO_dist const& mode) {
-  assert(mode.rho >= 0. && mode.rho <= 1.0);
   uint8_t rnd[Degree];
   value_type *ptr = &_data[0];
   fastrandombytes(rnd, sizeof(rnd));
   for (uint8_t r : rnd)
   {
-    double odd = r * 1. / 0xFF;
-    *ptr++ = odd > mode.rho ? (r & 2) - 1U : 0U;
+    *ptr++ = r >= mode.rho ? (r & 2) - 1U : 0U;
   }
   const value_type *end = &_data[N];
   while (ptr != end)
