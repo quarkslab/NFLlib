@@ -360,7 +360,7 @@ void poly<T, Degree, NbModuli>::set(hwt_dist const& mode) {
   std::vector<size_t> rnd(hitted.size());
   auto rnd_end = rnd.end();
   auto rnd_ptr = rnd_end;
-  /* Reservoir Sampling: uniformly select k coefficients. */
+  /* Reservoir Sampling: uniformly select hwt coefficients. */
   for (size_t k = mode.hwt; k < degree; ++k) 
   {
     size_t pos = 0;
