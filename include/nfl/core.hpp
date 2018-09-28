@@ -2,6 +2,9 @@
 #define NFL_CORE_HPP
 
 #include <type_traits>
+#include <vector>
+#include <numeric>
+#include <algorithm>
 
 #include "nfl/poly.hpp"
 #include "nfl/ops.hpp"
@@ -322,6 +325,76 @@ void poly<T, Degree, NbModuli>::set(gaussian<in_class, T, _lu_depth> const& mode
 #endif
 }
 
+template<class T, size_t Degree, size_t NbModuli>
+poly<T, Degree, NbModuli>::poly(ZO_dist const& mode) {
+  set(mode);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set(ZO_dist const& mode) {
+  uint8_t rnd[Degree];
+  value_type *ptr = &_data[0];
+  fastrandombytes(rnd, sizeof(rnd));
+  for (uint8_t r : rnd)
+  {
+    *ptr++ = r <= mode.rho ? (r & 2) - 1U : 0U;
+  }
+  const value_type *end = &_data[N];
+  while (ptr != end)
+  {
+    std::memcpy(ptr, ptr + degree, degree * sizeof(value_type));
+    ptr += degree;
+  }
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+poly<T, Degree, NbModuli>::poly(hwt_dist const& mode) {
+  set(mode);
+}
+
+template<class T, size_t Degree, size_t NbModuli>
+void poly<T, Degree, NbModuli>::set(hwt_dist const& mode) {
+  assert(mode.hwt > 0 && mode.hwt <= Degree);
+  std::vector<size_t> hitted(mode.hwt);
+  std::iota(hitted.begin(), hitted.end(), 0U); // select the first hwt positions.
+  std::vector<size_t> rnd(hitted.size());
+  auto rnd_end = rnd.end();
+  auto rnd_ptr = rnd_end;
+  /* Reservoir Sampling: uniformly select hwt coefficients. */
+  for (size_t k = mode.hwt; k < degree; ++k) 
+  {
+    size_t pos = 0;
+    size_t reject_sample = std::numeric_limits<size_t>::max() / k;
+    /* sample uniformly from [0, k) using reject sampling. */
+    for (;;) {
+      if (rnd_ptr == rnd_end)
+      {
+        fastrandombytes((unsigned char *)rnd.data(), rnd.size() * sizeof(size_t));
+        rnd_ptr = rnd.begin();
+      }
+      pos = *rnd_ptr++;
+      if (pos <= reject_sample * k) {
+        pos %= k;
+        break;
+      }
+    }
+    if (pos < mode.hwt)
+      hitted[pos] = k;
+  }
+
+  std::sort(hitted.begin(), hitted.end()); // for better locality ?
+  std::memset(_data, 0x0, N * sizeof(value_type)); // clear up all
+  size_t offset = 0;
+  while (offset < N) 
+  {
+    fastrandombytes((unsigned char *)rnd.data(), rnd.size() * sizeof(size_t));
+    rnd_ptr = rnd.begin();
+    for (size_t pos : hitted)
+      _data[pos + offset] = ((*rnd_ptr++) & 2U) - 1U; // {-1, 1}
+    offset += degree;
+  }
+  std::memset(hitted.data(), 0x0, hitted.size() * sizeof(size_t)); // erase from memory
+}
 
 // *********************************************************
 // Helper functions
