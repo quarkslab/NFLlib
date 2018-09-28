@@ -354,20 +354,30 @@ poly<T, Degree, NbModuli>::poly(hwt_dist const& mode) {
 
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(hwt_dist const& mode) {
-  assert(mode.hwt <= Degree);
+  assert(mode.hwt > 0 && mode.hwt <= Degree);
   std::vector<size_t> hitted(mode.hwt);
   std::iota(hitted.begin(), hitted.end(), 0U); // select the first hwt positions.
   std::vector<size_t> rnd(hitted.size());
   auto rnd_end = rnd.end();
   auto rnd_ptr = rnd_end;
+  /* Reservoir Sampling: uniformly select k coefficients. */
   for (size_t k = mode.hwt; k < degree; ++k) 
   {
-    if (rnd_ptr == rnd_end)
-    {
-      fastrandombytes((unsigned char *)rnd.data(), rnd.size() * sizeof(size_t));
-      rnd_ptr = rnd.begin();
+    size_t pos = 0;
+    size_t reject_sample = std::numeric_limits<size_t>::max() / k;
+    /* sample uniformly from [0, k) using reject sampling. */
+    for (;;) {
+      if (rnd_ptr == rnd_end)
+      {
+        fastrandombytes((unsigned char *)rnd.data(), rnd.size() * sizeof(size_t));
+        rnd_ptr = rnd.begin();
+      }
+      pos = *rnd_ptr++;
+      if (pos <= reject_sample * k) {
+        pos %= k;
+        break;
+      }
     }
-    size_t pos = (*rnd_ptr++) % k;
     if (pos < mode.hwt)
       hitted[pos] = k;
   }
