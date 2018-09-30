@@ -333,17 +333,13 @@ poly<T, Degree, NbModuli>::poly(ZO_dist const& mode) {
 template<class T, size_t Degree, size_t NbModuli>
 void poly<T, Degree, NbModuli>::set(ZO_dist const& mode) {
   uint8_t rnd[Degree];
-  value_type *ptr = &_data[0];
   fastrandombytes(rnd, sizeof(rnd));
-  for (uint8_t r : rnd)
-  {
-    *ptr++ = r <= mode.rho ? (r & 2) - 1U : 0U;
-  }
-  const value_type *end = &_data[N];
-  while (ptr != end)
-  {
-    std::memcpy(ptr, ptr + degree, degree * sizeof(value_type));
-    ptr += degree;
+  value_type *ptr = &_data[0];
+  for (size_t cm = 0; cm < NbModuli; ++cm) {
+    const T pm = params<T>::P[cm] - 1u;
+    /* sample {-1, 0, 1} */
+    for (size_t i = 0; i < Degree; ++i)
+      *ptr++ = rnd[i] <= mode.rho ? pm + (rnd[i] & 2) : 0u; 
   }
 }
 
@@ -384,14 +380,12 @@ void poly<T, Degree, NbModuli>::set(hwt_dist const& mode) {
 
   std::sort(hitted.begin(), hitted.end()); // for better locality ?
   std::memset(_data, 0x0, N * sizeof(value_type)); // clear up all
-  size_t offset = 0;
-  while (offset < N) 
-  {
-    fastrandombytes((unsigned char *)rnd.data(), rnd.size() * sizeof(size_t));
+  fastrandombytes((unsigned char *)rnd.data(), rnd.size() * sizeof(size_t));
+  for (size_t cm = 0, offset = 0; cm < NbModuli; ++cm, offset += degree) {
+    const T pm = params<T>::P[cm] - 1u;
     rnd_ptr = rnd.begin();
     for (size_t pos : hitted)
-      _data[pos + offset] = ((*rnd_ptr++) & 2U) - 1U; // {-1, 1}
-    offset += degree;
+      _data[pos + offset] = pm + ((*rnd_ptr++) & 2U); // {-1, 1}
   }
   std::memset(hitted.data(), 0x0, hitted.size() * sizeof(size_t)); // erase from memory
 }
