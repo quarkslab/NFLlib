@@ -7,7 +7,7 @@ NFLlib is an efficient and open-source C++ library dedicated to ideal lattice cr
 
 ## License
 
-GPLv3
+MIT
 
 # Install Steps
 
