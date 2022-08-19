@@ -30,7 +30,7 @@ endif()
 include(CMakeCompilers.txt)
 
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 
