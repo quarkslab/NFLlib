@@ -8,6 +8,8 @@
 #define FASTRANDOMBYTES_H
 
 namespace nfl {
+void fastrandombytes_seed(const unsigned char *s);
+void fastrandombytes_reseed();
 void fastrandombytes(unsigned char *r, unsigned long long rlen);
 }
 
